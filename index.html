@@ -3,148 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SD STORE AND TECH - ISP Dashboard</title>
-    
+    <title>SD STORE AND TECH</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        :root {
-            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #6366f1;
-            --border: #e2e8f0; --header-h: 175px; 
-            --home-accent: #0ea5e9; --hot-accent: #f59e0b;
-        }
-        [data-theme="dark"] {
-            --bg: #020617; --card: #0f172a; --text: #f1f5f9; --accent: #818cf8;
-            --border: #1e293b;
-        }
-
-        body {
-            font-family: 'Hind Siliguri', sans-serif;
-            background-color: var(--bg); color: var(--text);
-            margin: 0; padding-top: var(--header-h); transition: 0.2s;
-        }
-
-        header {
-            position: fixed; top: 0; left: 0; right: 0;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            padding: 10px 15px; z-index: 1000;
-            border-bottom: 3px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .shop-name {
-            font-size: 17px; font-weight: 800; color: #fff;
-            margin: 0; text-align: left; display: flex; align-items: center; gap: 8px;
-        }
-
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        :root { --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #6366f1; --header-h: 210px; }
+        [data-theme="dark"] { --bg: #020617; --card: #0f172a; --text: #f1f5f9; --accent: #818cf8; }
+        body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-top: var(--header-h); transition: 0.3s; }
         
-        .header-actions { display: flex; gap: 8px; }
-        .icon-btn { 
-            background: rgba(255,255,255,0.2); border: none; color: #fff;
-            padding: 7px 12px; border-radius: 8px; cursor: pointer;
-            display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600;
-        }
+        /* Loading Overlay */
+        #loader { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; flex-direction:column; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px); }
+        .spinner { width:50px; height:50px; border:5px solid #fff; border-top-color:var(--accent); border-radius:50%; animation:spin 1s linear infinite; margin-bottom:15px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-        .last-update { font-size: 10px; color: rgba(255,255,255,0.8); margin-top: 3px; font-weight: 500; }
+        header { position:fixed; top:0; left:0; right:0; background:linear-gradient(135deg, #4f46e5, #7c3aed); padding:10px 15px; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+        .top-bar { display:flex; justify-content:space-between; align-items:center; }
+        .shop-name { font-size:16px; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px; }
+        
+        /* Sorting Section */
+        .sort-bar { display:flex; gap:10px; margin-top:8px; background:rgba(255,255,255,0.1); padding:5px; border-radius:8px; }
+        .sort-bar select { background:none; border:none; color:white; font-size:12px; font-weight:600; outline:none; cursor:pointer; flex:1; }
 
-        .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-        .tab { 
-            flex: 1; padding: 8px; text-align: center; background: rgba(255,255,255,0.15);
-            border-radius: 8px; font-size: 13px; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.1); color: #fff; font-weight: 600;
-        }
-        .tab.active { background: #fff; color: #4f46e5; border-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .tabs { display:flex; gap:5px; margin:10px 0; }
+        .tab { flex:1; padding:8px; text-align:center; background:rgba(255,255,255,0.1); border-radius:8px; font-size:12px; cursor:pointer; color:#fff; font-weight:600; }
+        .tab.active { background:#fff; color:#4f46e5; }
 
-        .search-wrapper { position: relative; display: flex; align-items: center; }
-        .search-box input {
-            width: 100%; padding: 10px 35px 10px 35px; border-radius: 10px; background: #fff;
-            border: none; color: #1e293b; box-sizing: border-box; outline: none; font-size: 14px;
-        }
-        .search-icon { position: absolute; left: 12px; color: #94a3b8; font-size: 14px; }
-        .clear-btn {
-            position: absolute; right: 10px; background: none; border: none;
-            color: #ef4444; cursor: pointer; display: none; font-size: 18px;
-        }
+        .search-box { position:relative; }
+        .search-box input { width:100%; padding:10px 40px; border-radius:10px; border:none; outline:none; font-size:14px; box-sizing:border-box; }
+        .search-icon { position:absolute; left:12px; top:12px; color:#94a3b8; }
+        .clear-btn { position:absolute; right:10px; top:8px; background:none; border:none; color:#ef4444; font-size:20px; display:none; }
 
-        #addBtn { 
-            width: 100%; margin-top: 8px; padding: 10px; border-radius: 10px; 
-            border: none; font-weight: 700; cursor: pointer; display: none;
-            background: #22c55e; color: white; font-size: 14px; box-shadow: 0 4px 10px rgba(34,197,94,0.3);
-        }
+        .container { padding:12px; }
+        .user-card { background:var(--card); border-radius:15px; padding:15px; margin-bottom:12px; border-left:5px solid var(--accent); box-shadow:0 4px 10px rgba(0,0,0,0.05); position:relative; animation:slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .card-home { border-left-color: #0ea5e9; }
+        .card-hotspot { border-left-color: #f59e0b; }
+        
+        .b-id-tag { font-size:10px; color:#0ea5e9; font-weight:700; margin-bottom:5px; background:rgba(14,165,233,0.1); padding:2px 8px; border-radius:4px; display:inline-block; }
+        .user-name { font-size:15px; font-weight:700; display:block; margin-bottom:5px; }
+        .status-pill { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700; }
+        .pill-exp { background:#fee2e2; color:#ef4444; }
+        .pill-active { background:#dcfce7; color:#22c55e; }
 
-        .container { padding: 12px; }
-        .user-card {
-            background: var(--card); border-radius: 16px; padding: 15px;
-            margin-bottom: 12px; border-left: 5px solid var(--accent);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.2s; position: relative;
-        }
-        .card-home { border-left-color: var(--home-accent); }
-        .card-hotspot { border-left-color: var(--hot-accent); }
-
-        .b-id-tag { 
-            font-size: 11px; color: var(--home-accent); font-weight: 700; 
-            margin-bottom: 8px; background: rgba(14, 165, 233, 0.1); 
-            display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 6px; 
-        }
-
-        .user-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
-        .status-pill { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
-        .pill-exp { background: #fee2e2; color: #ef4444; }
-        .pill-active { background: #dcfce7; color: #22c55e; }
-
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; opacity: 0.7; font-weight: 600; border-top: 1px solid var(--border); padding-top: 8px; }
-
-        .modal {
-            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
-            z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background: var(--card); width: 100%; max-width: 350px;
-            border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        .m-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 14px; }
-        .m-row i { color: var(--accent); width: 20px; text-align: center; }
-
-        #payLink {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: linear-gradient(135deg, #10b981, #059669); color: #fff;
-            padding: 14px; border-radius: 12px; text-decoration: none; margin-top: 20px; font-weight: 700;
-        }
-
-        #toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: white; padding: 12px 25px;
-            border-radius: 30px; font-size: 13px; font-weight: 600; display: none; z-index: 3000;
-        }
+        #addBtn { width:100%; margin-top:8px; padding:10px; border-radius:10px; border:none; font-weight:700; background:#22c55e; color:white; display:none; }
+        #toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:10px 20px; border-radius:20px; font-size:13px; display:none; z-index:9999; }
+        
+        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px); }
+        .modal-content { background:var(--card); width:100%; max-width:340px; border-radius:20px; padding:20px; }
     </style>
 </head>
-<body data-theme="light">
+<body>
+
+<div id="loader"><div class="spinner"></div><b id="loaderText">অপেক্ষা করুন...</b></div>
 
 <header>
     <div class="top-bar">
-        <h1 class="shop-name"><i class="fa-solid fa-shop"></i> SD STORE AND TECH</h1>
-        <div class="header-actions">
-            <button class="icon-btn" onclick="toggleTheme()"><i id="tIcon" class="fa-solid fa-moon"></i></button>
-            <button class="icon-btn" style="background:#fff; color:#4f46e5" onclick="syncData()"><i class="fa-solid fa-arrows-rotate"></i> আপডেট</button>
+        <h1 class="shop-name"><i class="fa-solid fa-store"></i> SD STORE</h1>
+        <div style="display:flex; gap:8px">
+            <button class="icon-btn" onclick="toggleTheme()" style="background:none; border:none; color:white; font-size:18px;"><i id="tIcon" class="fa-solid fa-moon"></i></button>
+            <button class="icon-btn" onclick="syncData()" style="background:#fff; color:#4f46e5; border:none; padding:5px 12px; border-radius:8px; font-weight:700; font-size:12px;">আপডেট</button>
         </div>
     </div>
     
+    <div class="sort-bar">
+        <select id="sortType" onchange="render()">
+            <option value="newest">নতুন আগে</option>
+            <option value="oldest">পুরাতন আগে</option>
+            <option value="name">নাম অনুযায়ী</option>
+        </select>
+        <div style="font-size:10px; color:#fff; opacity:0.8" id="lastUpdateTime">লোড হচ্ছে...</div>
+    </div>
+
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('all', this)"><i class="fa-solid fa-border-all"></i> All</div>
-        <div class="tab" onclick="switchTab('home', this)"><i class="fa-solid fa-house-signal"></i> Home</div>
-        <div class="tab" onclick="switchTab('hot', this)"><i class="fa-solid fa-wifi"></i> Hotspot</div>
+        <div class="tab active" onclick="switchTab('all', this)">All</div>
+        <div class="tab" onclick="switchTab('home', this)">Home (7)</div>
+        <div class="tab" onclick="switchTab('hot', this)">Hotspot (11)</div>
     </div>
 
     <div class="search-box">
-        <div class="search-wrapper">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="searchInput" onkeyup="handleInput()" placeholder="নাম বা আইডি দিয়ে খুঁজুন...">
-            <button class="clear-btn" id="clearBtn" onclick="clearSearch()"><i class="fa-solid fa-circle-xmark"></i></button>
-        </div>
-        <div class="last-update" id="lastUpdateTime"><i class="fa-regular fa-clock"></i> আপডেট: কিছুক্ষণ আগে</div>
-        <button id="addBtn" onclick="actionAdd()"><i class="fa-solid fa-user-plus"></i> Add New User</button>
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" onkeyup="handleInput()" placeholder="ID বা নাম দিয়ে খুঁজুন...">
+        <button class="clear-btn" id="clearBtn" onclick="clearSearch()">&times;</button>
+        <button id="addBtn" onclick="actionAdd()"><i class="fa-solid fa-plus"></i> Add New User</button>
     </div>
 </header>
 
@@ -152,32 +92,50 @@
 
 <div class="modal" id="dialog" onclick="this.style.display='none'">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 id="mName" style="margin: 0 0 20px 0; color:var(--accent); text-align:center; font-size:20px;"></h3>
-        <div id="mDetails"></div>
-        <a id="payLink" href="#" target="_blank"><i class="fa-solid fa-credit-card"></i> Pay Now</a>
-        <button onclick="confirmDelete()" style="width:100%; border:none; background:none; color:#ef4444; margin-top:15px; font-weight:600; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> ডিলিট ইউজার</button>
+        <h3 id="mName" style="margin:0 0 15px 0"></h3>
+        <div id="mDetails" style="font-size:14px; line-height:1.6"></div>
+        <a id="payLink" href="#" target="_blank" style="display:block; background:#10b981; color:#fff; text-align:center; padding:12px; border-radius:10px; text-decoration:none; margin-top:20px; font-weight:700;">Pay Now</a>
+        <button onclick="confirmDelete()" style="width:100%; border:none; background:none; color:#ef4444; margin-top:15px; font-weight:600;"><i class="fa-solid fa-trash"></i> Delete User</button>
     </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-    let allUsers = [], currentTab = 'all', debounceTimer, activeId = null;
+    let allUsers = [], currentTab = 'all', activeId = null;
     const API_URL = "https://hs-internet.onrender.com";
 
-    window.onload = () => { applyTheme(); load(); };
+    window.onload = () => {
+        applyTheme();
+        const cached = localStorage.getItem('isp_data');
+        if(cached) {
+            allUsers = JSON.parse(cached);
+            render();
+            document.getElementById('lastUpdateTime').innerText = "অফলাইন মোড";
+        }
+        load();
+    };
+
+    function showLoader(text) {
+        document.getElementById('loaderText').innerText = text;
+        document.getElementById('loader').style.display = 'flex';
+    }
+    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
     async function load() {
         try {
             const r = await fetch(`${API_URL}/get_all_users`);
             allUsers = await r.json();
+            localStorage.setItem('isp_data', JSON.stringify(allUsers));
             render();
-        } catch(e) { showToast("সার্ভার কানেক্ট হচ্ছে না!"); }
+            document.getElementById('lastUpdateTime').innerText = "অনলাইন";
+        } catch(e) { showToast("সার্ভার অফলাইন!"); }
     }
 
     function render() {
         const container = document.getElementById('userList');
         const q = document.getElementById('searchInput').value.trim().toLowerCase();
+        const sort = document.getElementById('sortType').value;
         
         let filtered = allUsers.filter(u => 
             (u.name && u.name.toLowerCase().includes(q)) || 
@@ -185,103 +143,102 @@
             (u.billing_id && u.billing_id.toString().includes(q))
         );
 
-        if(currentTab === 'home') {
-            filtered = filtered.filter(u => (u.user_id && u.user_id.toString().length === 7) || (u.billing_id && u.billing_id !== ""));
-        } else if(currentTab === 'hot') {
-            filtered = filtered.filter(u => (u.user_id && u.user_id.toString().length === 11) && (!u.billing_id || u.billing_id === ""));
-        }
+        if(currentTab === 'home') filtered = filtered.filter(u => u.user_id.toString().length === 7);
+        else if(currentTab === 'hot') filtered = filtered.filter(u => u.user_id.toString().length === 11);
+
+        // Sorting Logic
+        if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+        else if(sort === 'oldest') filtered.reverse(); // Default is newest first
 
         let html = '';
         filtered.forEach(u => {
-            const isHome = (u.user_id && u.user_id.toString().length === 7) || (u.billing_id && u.billing_id !== "");
+            const isHome = u.user_id.toString().length === 7;
             const isExp = u.expire ? new Date(parseDate(u.expire)) < new Date() : false;
             
             html += `
                 <div class="user-card ${isHome?'card-home':'card-hotspot'}" onclick="openDialog('${u.user_id}')">
-                    ${u.billing_id ? `<div class="b-id-tag"><i class="fa-solid fa-receipt"></i> BILL ID: ${u.billing_id}</div>` : ''}
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div class="user-name">${u.name || 'অজানা ইউজার'}</div>
-                        <span class="status-pill ${isExp?'pill-exp':'pill-active'}">
-                            <i class="fa-solid ${isExp?'fa-calendar-xmark':'fa-calendar-check'}"></i> ${u.expire ? u.expire.split(' ')[0] : '...'}
-                        </span>
+                    ${u.billing_id ? `<div class="b-id-tag">BILLING: ${u.billing_id}</div>` : ''}
+                    <div style="display:flex; justify-content:space-between">
+                        <span class="user-name">${u.name || 'নতুন ইউজার'}</span>
+                        <span class="status-pill ${isExp?'pill-exp':'pill-active'}">${u.expire ? u.expire.split(' ')[0] : '...'}</span>
                     </div>
-                    <div class="card-footer">
-                        <span><i class="fa-solid fa-id-card-clip"></i> ${u.user_id}</span>
-                        <span><i class="fa-solid fa-box-archive"></i> ${u.package || 'No Plan'}</span>
+                    <div style="font-size:11px; opacity:0.7; margin-top:5px;">
+                        <i class="fa-solid fa-id-badge"></i> ${u.user_id} | <i class="fa-solid fa-box"></i> ${u.package || 'আপডেট করুন'}
                     </div>
                 </div>`;
         });
-        container.innerHTML = html;
+        container.innerHTML = html || '<p style="text-align:center; opacity:0.5">কোন তথ্য পাওয়া যায়নি</p>';
     }
 
     function handleInput() {
         const val = document.getElementById('searchInput').value.trim();
         document.getElementById('clearBtn').style.display = val.length > 0 ? 'block' : 'none';
-        
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            if(val.length === 7 || val.length === 11) {
-                const exists = allUsers.find(u => (u.user_id.toString() === val) || (u.billing_id && u.billing_id.toString() === val));
-                document.getElementById('addBtn').style.display = exists ? 'none' : 'block';
-            } else { document.getElementById('addBtn').style.display = 'none'; }
-            render();
-        }, 150);
+        document.getElementById('addBtn').style.display = (val.length === 7 || val.length === 11) ? 'block' : 'none';
+        render();
     }
 
     async function actionAdd() {
         const id = document.getElementById('searchInput').value;
-        showToast("খোঁজা হচ্ছে...");
+        showLoader("ইউজার যোগ করা হচ্ছে...");
         try {
             const r = await fetch(`${API_URL}/fetch_user?id=${id}`);
-            const d = await r.json();
-            if(d.success) { load(); clearSearch(); showToast("সফল!"); }
-            else showToast("পাওয়া যায়নি!");
-        } catch(e) { showToast("ত্রুটি!"); }
+            await r.json();
+            await load();
+            clearSearch();
+            showToast("সফলভাবে যোগ হয়েছে!");
+        } catch(e) { showToast("ত্রুটি হয়েছে!"); }
+        hideLoader();
     }
 
     async function syncData() {
-        showToast("সিঙ্ক হচ্ছে...");
+        showLoader("গুগল শিট সিঙ্ক হচ্ছে...");
         try {
             const res = await fetch(`${API_URL}/sync_sheet`);
-            const data = await res.json();
-            const now = new Date();
-            document.getElementById('lastUpdateTime').innerHTML = `<i class="fa-regular fa-clock"></i> আপডেট: আজ ${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
-            load();
-            showToast("আপডেট সফল!");
-        } catch(e) { showToast("ত্রুটি হয়েছে!"); }
+            await res.json();
+            await load();
+            showToast("সব তথ্য আপডেট হয়েছে!");
+        } catch(e) { showToast("সিঙ্ক এরর!"); }
+        hideLoader();
     }
 
     async function confirmDelete() {
-        if(confirm("ইউজারটি কি ডিলিট করবেন?")) {
-            const u = allUsers.find(x => x.user_id.toString() === activeId.toString());
-            const delId = (u.billing_id && u.billing_id !== "") ? u.billing_id : u.user_id;
-            try {
-                await fetch(`${API_URL}/delete_user?id=${delId}`);
-                document.getElementById('dialog').style.display = 'none';
-                load();
-                showToast("ডিলিট হয়েছে!");
-            } catch(e) { showToast("ডিলিট এরর!"); }
-        }
+        if(!confirm("নিশ্চিত ডিলিট করবেন?")) return;
+        showLoader("মুছে ফেলা হচ্ছে...");
+        try {
+            await fetch(`${API_URL}/delete_user?id=${activeId}`);
+            await load();
+            document.getElementById('dialog').style.display = 'none';
+            showToast("ডিলিট সফল!");
+        } catch(e) { showToast("এরর!"); }
+        hideLoader();
     }
 
     function openDialog(id) {
         activeId = id;
         const u = allUsers.find(x => x.user_id.toString() === id.toString());
-        document.getElementById('mName').innerText = u.name;
-        document.getElementById('mDetails').innerHTML = `
-            <div class="m-row"><i class="fa-solid fa-fingerprint"></i> <b>User ID:</b> ${u.user_id}</div>
-            ${u.billing_id ? `<div class="m-row"><i class="fa-solid fa-receipt"></i> <b>Billing ID:</b> ${u.billing_id}</div>` : ''}
-            <div class="m-row"><i class="fa-solid fa-box-open"></i> <b>Package:</b> ${u.package}</div>
-            <div class="m-row"><i class="fa-solid fa-clock"></i> <b>Expires:</b> ${u.expire}</div>
-        `;
-        const payQuery = (u.billing_id && u.billing_id !== "") ? u.billing_id : u.user_id;
-        document.getElementById('payLink').href = `https://ispbill.com/pay.php?c=1021&q=${payQuery}`;
+        document.getElementById('mName').innerText = u.name || "নতুন ইউজার";
+        document.getElementById('mDetails').innerHTML = `<b>ID:</b> ${u.user_id}<br><b>প্যাকেজ:</b> ${u.package}<br><b>মেয়াদ:</b> ${u.expire}`;
+        document.getElementById('payLink').href = `https://ispbill.com/pay.php?c=1021&q=${u.user_id}`;
         document.getElementById('dialog').style.display = 'flex';
     }
 
+    function parseDate(s) {
+        try {
+            const [d, t] = s.split(' '); const [day, mon, yr] = d.split('-');
+            return `${yr}-${mon}-${day}T${t}`;
+        } catch(e) { return "1970-01-01"; }
+    }
+
+    function switchTab(t, el) {
+        currentTab = t;
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        el.classList.add('active');
+        render();
+    }
+
     function toggleTheme() {
-        const current = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('theme', current);
+        const t = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', t);
         applyTheme();
     }
 
@@ -292,25 +249,7 @@
     }
 
     function clearSearch() { document.getElementById('searchInput').value = ''; handleInput(); }
-
-    function switchTab(t, el) {
-        currentTab = t;
-        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-        el.classList.add('active');
-        render();
-    }
-
-    function parseDate(s) {
-        try {
-            const [d, t] = s.split(' '); const [day, mon, yr] = d.split('-');
-            return `${yr}-${mon}-${day}T${t}`;
-        } catch(e) { return "1970-01-01"; }
-    }
-
-    function showToast(m) {
-        const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 2000);
-    }
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
 </script>
 </body>
 </html>
