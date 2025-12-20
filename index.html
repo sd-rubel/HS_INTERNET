@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SD STORE AND TECH</title>
+    <title>SD STORE AND TECH - ISP Dashboard</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,10 +25,9 @@
             margin: 0; padding-top: var(--header-h); transition: 0.2s;
         }
 
-        /* স্লিম এবং রিচ হেডার */
         header {
             position: fixed; top: 0; left: 0; right: 0;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed); /* হালকা ভায়োলেট গ্রেডিয়েন্ট */
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
             padding: 10px 15px; z-index: 1000;
             border-bottom: 3px solid rgba(255,255,255,0.2);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -75,7 +74,6 @@
             background: #22c55e; color: white; font-size: 14px; box-shadow: 0 4px 10px rgba(34,197,94,0.3);
         }
 
-        /* কার্ড ডিজাইন উইথ আইকনস */
         .container { padding: 12px; }
         .user-card {
             background: var(--card); border-radius: 16px; padding: 15px;
@@ -98,7 +96,6 @@
 
         .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; opacity: 0.7; font-weight: 600; border-top: 1px solid var(--border); padding-top: 8px; }
 
-        /* মোডাল ডিজাইন */
         .modal {
             display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
             z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px);
@@ -165,13 +162,14 @@
 <div id="toast"></div>
 
 <script>
-    let allUsers = [], currentTab = 'all', debounceTimer;
+    let allUsers = [], currentTab = 'all', debounceTimer, activeId = null;
+    const API_URL = "https://hs-internet.onrender.com";
 
     window.onload = () => { applyTheme(); load(); };
 
     async function load() {
         try {
-            const r = await fetch('http://127.0.0.1:5000/get_all_users');
+            const r = await fetch(`${API_URL}/get_all_users`);
             allUsers = await r.json();
             render();
         } catch(e) { showToast("সার্ভার কানেক্ট হচ্ছে না!"); }
@@ -230,7 +228,44 @@
         }, 150);
     }
 
+    async function actionAdd() {
+        const id = document.getElementById('searchInput').value;
+        showToast("খোঁজা হচ্ছে...");
+        try {
+            const r = await fetch(`${API_URL}/fetch_user?id=${id}`);
+            const d = await r.json();
+            if(d.success) { load(); clearSearch(); showToast("সফল!"); }
+            else showToast("পাওয়া যায়নি!");
+        } catch(e) { showToast("ত্রুটি!"); }
+    }
+
+    async function syncData() {
+        showToast("সিঙ্ক হচ্ছে...");
+        try {
+            const res = await fetch(`${API_URL}/sync_sheet`);
+            const data = await res.json();
+            const now = new Date();
+            document.getElementById('lastUpdateTime').innerHTML = `<i class="fa-regular fa-clock"></i> আপডেট: আজ ${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
+            load();
+            showToast("আপডেট সফল!");
+        } catch(e) { showToast("ত্রুটি হয়েছে!"); }
+    }
+
+    async function confirmDelete() {
+        if(confirm("ইউজারটি কি ডিলিট করবেন?")) {
+            const u = allUsers.find(x => x.user_id.toString() === activeId.toString());
+            const delId = (u.billing_id && u.billing_id !== "") ? u.billing_id : u.user_id;
+            try {
+                await fetch(`${API_URL}/delete_user?id=${delId}`);
+                document.getElementById('dialog').style.display = 'none';
+                load();
+                showToast("ডিলিট হয়েছে!");
+            } catch(e) { showToast("ডিলিট এরর!"); }
+        }
+    }
+
     function openDialog(id) {
+        activeId = id;
         const u = allUsers.find(x => x.user_id.toString() === id.toString());
         document.getElementById('mName').innerText = u.name;
         document.getElementById('mDetails').innerHTML = `
@@ -242,19 +277,6 @@
         const payQuery = (u.billing_id && u.billing_id !== "") ? u.billing_id : u.user_id;
         document.getElementById('payLink').href = `https://ispbill.com/pay.php?c=1021&q=${payQuery}`;
         document.getElementById('dialog').style.display = 'flex';
-    }
-
-    // অন্যান্য ফাংশনসমূহ (syncData, toggleTheme, clearSearch, ইত্যাদি)
-    async function syncData() {
-        showToast("সিঙ্ক হচ্ছে...");
-        try {
-            const res = await fetch('http://127.0.0.1:5000/sync_sheet');
-            const data = await res.json();
-            const now = new Date();
-            document.getElementById('lastUpdateTime').innerHTML = `<i class="fa-regular fa-clock"></i> আপডেট: আজ ${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
-            load();
-            showToast("আপডেট সফল!");
-        } catch(e) { showToast("ত্রুটি হয়েছে!"); }
     }
 
     function toggleTheme() {
@@ -283,28 +305,6 @@
             const [d, t] = s.split(' '); const [day, mon, yr] = d.split('-');
             return `${yr}-${mon}-${day}T${t}`;
         } catch(e) { return "1970-01-01"; }
-    }
-
-    async function actionAdd() {
-        const id = document.getElementById('searchInput').value;
-        showToast("খোঁজা হচ্ছে...");
-        try {
-            const r = await fetch(`http://127.0.0.1:5000/fetch_user?id=${id}`);
-            const d = await r.json();
-            if(d.success) { load(); clearSearch(); showToast("সফল!"); }
-            else showToast("পাওয়া যায়নি!");
-        } catch(e) { showToast("ত্রুটি!"); }
-    }
-
-    async function confirmDelete() {
-        if(confirm("ইউজারটি কি ডিলিট করবেন?")) {
-            const u = allUsers.find(x => x.user_id.toString() === activeId.toString());
-            const delId = (u.billing_id && u.billing_id !== "") ? u.billing_id : u.user_id;
-            await fetch(`http://127.0.0.1:5000/delete_user?id=${delId}`);
-            document.getElementById('dialog').style.display = 'none';
-            load();
-            showToast("ডিলিট হয়েছে!");
-        }
     }
 
     function showToast(m) {
