@@ -7,76 +7,75 @@
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #6366f1; --header-h: 210px; }
+        :root { --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #6366f1; --header-h: 215px; }
         [data-theme="dark"] { --bg: #020617; --card: #0f172a; --text: #f1f5f9; --accent: #818cf8; }
-        body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-top: var(--header-h); transition: 0.3s; }
+        body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-top: var(--header-h); transition: 0.3s; overflow-x: hidden; }
         
-        /* Loading Overlay */
-        #loader { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; flex-direction:column; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px); }
-        .spinner { width:50px; height:50px; border:5px solid #fff; border-top-color:var(--accent); border-radius:50%; animation:spin 1s linear infinite; margin-bottom:15px; }
+        #loader { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; align-items:center; justify-content:center; color:white; backdrop-filter:blur(8px); }
+        .spinner { width:50px; height:50px; border:5px solid rgba(255,255,255,0.1); border-top-color:var(--accent); border-radius:50%; animation:spin 1s linear infinite; margin-bottom:15px; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        header { position:fixed; top:0; left:0; right:0; background:linear-gradient(135deg, #4f46e5, #7c3aed); padding:10px 15px; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+        header { position:fixed; top:0; left:0; right:0; background:linear-gradient(135deg, #4f46e5, #7c3aed); padding:10px 15px; z-index:1000; box-shadow:0 4px 20px rgba(0,0,0,0.2); border-bottom:3px solid rgba(255,255,255,0.1); }
         .top-bar { display:flex; justify-content:space-between; align-items:center; }
         .shop-name { font-size:16px; font-weight:800; color:#fff; display:flex; align-items:center; gap:8px; }
         
-        /* Sorting Section */
-        .sort-bar { display:flex; gap:10px; margin-top:8px; background:rgba(255,255,255,0.1); padding:5px; border-radius:8px; }
-        .sort-bar select { background:none; border:none; color:white; font-size:12px; font-weight:600; outline:none; cursor:pointer; flex:1; }
+        .sort-bar { display:flex; gap:10px; margin-top:10px; background:rgba(255,255,255,0.15); padding:8px; border-radius:10px; align-items:center; }
+        .sort-bar select { background:none; border:none; color:white; font-size:13px; font-weight:600; outline:none; flex:1; }
 
-        .tabs { display:flex; gap:5px; margin:10px 0; }
-        .tab { flex:1; padding:8px; text-align:center; background:rgba(255,255,255,0.1); border-radius:8px; font-size:12px; cursor:pointer; color:#fff; font-weight:600; }
-        .tab.active { background:#fff; color:#4f46e5; }
+        .tabs { display:flex; gap:6px; margin:12px 0; }
+        .tab { flex:1; padding:10px; text-align:center; background:rgba(255,255,255,0.15); border-radius:12px; font-size:13px; cursor:pointer; color:#fff; font-weight:700; transition:0.2s; }
+        .tab.active { background:#fff; color:#4f46e5; transform: scale(1.05); }
 
         .search-box { position:relative; }
-        .search-box input { width:100%; padding:10px 40px; border-radius:10px; border:none; outline:none; font-size:14px; box-sizing:border-box; }
-        .search-icon { position:absolute; left:12px; top:12px; color:#94a3b8; }
-        .clear-btn { position:absolute; right:10px; top:8px; background:none; border:none; color:#ef4444; font-size:20px; display:none; }
+        .search-box input { width:100%; padding:12px 40px; border-radius:12px; border:none; outline:none; font-size:14px; box-sizing:border-box; background: #fff; color: #1e293b; }
+        .search-icon { position:absolute; left:12px; top:14px; color:#94a3b8; }
+        .clear-btn { position:absolute; right:12px; top:10px; background:none; border:none; color:#ef4444; font-size:22px; cursor:pointer; display:none; }
 
-        .container { padding:12px; }
-        .user-card { background:var(--card); border-radius:15px; padding:15px; margin-bottom:12px; border-left:5px solid var(--accent); box-shadow:0 4px 10px rgba(0,0,0,0.05); position:relative; animation:slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .container { padding:15px; }
+        .user-card { background:var(--card); border-radius:18px; padding:18px; margin-bottom:15px; border-left:6px solid var(--accent); box-shadow:0 6px 15px rgba(0,0,0,0.06); position:relative; animation:slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
         .card-home { border-left-color: #0ea5e9; }
         .card-hotspot { border-left-color: #f59e0b; }
         
-        .b-id-tag { font-size:10px; color:#0ea5e9; font-weight:700; margin-bottom:5px; background:rgba(14,165,233,0.1); padding:2px 8px; border-radius:4px; display:inline-block; }
-        .user-name { font-size:15px; font-weight:700; display:block; margin-bottom:5px; }
-        .status-pill { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700; }
+        .b-id-tag { font-size:10px; color:#0ea5e9; font-weight:800; margin-bottom:6px; background:rgba(14,165,233,0.1); padding:3px 10px; border-radius:6px; display:inline-block; }
+        .user-name { font-size:16px; font-weight:700; display:block; margin-bottom:6px; color: var(--text); }
+        .status-pill { font-size:11px; padding:3px 10px; border-radius:12px; font-weight:800; display:inline-flex; align-items:center; gap:4px; }
         .pill-exp { background:#fee2e2; color:#ef4444; }
         .pill-active { background:#dcfce7; color:#22c55e; }
 
-        #addBtn { width:100%; margin-top:8px; padding:10px; border-radius:10px; border:none; font-weight:700; background:#22c55e; color:white; display:none; }
-        #toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:10px 20px; border-radius:20px; font-size:13px; display:none; z-index:9999; }
+        #addBtn { width:100%; margin-top:10px; padding:12px; border-radius:12px; border:none; font-weight:700; background:#22c55e; color:white; display:none; box-shadow:0 4px 10px rgba(34,197,94,0.3); }
+        #toast { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 25px; border-radius:30px; font-size:13px; font-weight:600; display:none; z-index:9999; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
         
-        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px); }
-        .modal-content { background:var(--card); width:100%; max-width:340px; border-radius:20px; padding:20px; }
+        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:2000; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(6px); }
+        .modal-content { background:var(--card); width:100%; max-width:340px; border-radius:25px; padding:25px; box-shadow:0 20px 40px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div><b id="loaderText">অপেক্ষা করুন...</b></div>
+<div id="loader"><div class="spinner"></div><b id="loaderText">প্রসেসিং হচ্ছে...</b></div>
 
 <header>
     <div class="top-bar">
-        <h1 class="shop-name"><i class="fa-solid fa-store"></i> SD STORE</h1>
-        <div style="display:flex; gap:8px">
-            <button class="icon-btn" onclick="toggleTheme()" style="background:none; border:none; color:white; font-size:18px;"><i id="tIcon" class="fa-solid fa-moon"></i></button>
-            <button class="icon-btn" onclick="syncData()" style="background:#fff; color:#4f46e5; border:none; padding:5px 12px; border-radius:8px; font-weight:700; font-size:12px;">আপডেট</button>
+        <h1 class="shop-name"><i class="fa-solid fa-store"></i> SD STORE AND TECH</h1>
+        <div style="display:flex; gap:10px">
+            <button onclick="toggleTheme()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;"><i id="tIcon" class="fa-solid fa-moon"></i></button>
+            <button onclick="syncData()" style="background:#fff; color:#4f46e5; border:none; padding:6px 15px; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer;">আপডেট</button>
         </div>
     </div>
     
     <div class="sort-bar">
+        <i class="fa-solid fa-filter" style="color:white; font-size:12px; margin-left:5px;"></i>
         <select id="sortType" onchange="render()">
-            <option value="newest">নতুন আগে</option>
-            <option value="oldest">পুরাতন আগে</option>
-            <option value="name">নাম অনুযায়ী</option>
+            <option value="newest">নতুন ইউজার আগে</option>
+            <option value="name">নাম অনুযায়ী (A-Z)</option>
+            <option value="oldest">পুরাতন গুলো আগে</option>
         </select>
-        <div style="font-size:10px; color:#fff; opacity:0.8" id="lastUpdateTime">লোড হচ্ছে...</div>
+        <div id="statusDot" style="width:8px; height:8px; background:#22c55e; border-radius:50%; margin-right:5px;"></div>
     </div>
 
     <div class="tabs">
         <div class="tab active" onclick="switchTab('all', this)">All</div>
-        <div class="tab" onclick="switchTab('home', this)">Home (7)</div>
+        <div class="tab" onclick="switchTab('home', this)">Home (7/Bill)</div>
         <div class="tab" onclick="switchTab('hot', this)">Hotspot (11)</div>
     </div>
 
@@ -84,7 +83,7 @@
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input type="text" id="searchInput" onkeyup="handleInput()" placeholder="ID বা নাম দিয়ে খুঁজুন...">
         <button class="clear-btn" id="clearBtn" onclick="clearSearch()">&times;</button>
-        <button id="addBtn" onclick="actionAdd()"><i class="fa-solid fa-plus"></i> Add New User</button>
+        <button id="addBtn" onclick="actionAdd()"><i class="fa-solid fa-user-plus"></i> Add To Cloud</button>
     </div>
 </header>
 
@@ -92,10 +91,10 @@
 
 <div class="modal" id="dialog" onclick="this.style.display='none'">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 id="mName" style="margin:0 0 15px 0"></h3>
-        <div id="mDetails" style="font-size:14px; line-height:1.6"></div>
-        <a id="payLink" href="#" target="_blank" style="display:block; background:#10b981; color:#fff; text-align:center; padding:12px; border-radius:10px; text-decoration:none; margin-top:20px; font-weight:700;">Pay Now</a>
-        <button onclick="confirmDelete()" style="width:100%; border:none; background:none; color:#ef4444; margin-top:15px; font-weight:600;"><i class="fa-solid fa-trash"></i> Delete User</button>
+        <h3 id="mName" style="margin:0 0 20px 0; color:var(--accent); text-align:center;"></h3>
+        <div id="mDetails" style="font-size:15px; line-height:1.8; border-top:1px solid #eee; padding-top:15px;"></div>
+        <a id="payLink" href="#" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:15px; border-radius:15px; text-decoration:none; margin-top:25px; font-weight:800; font-size:16px;"><i class="fa-solid fa-credit-card"></i> Pay Now</a>
+        <button onclick="confirmDelete()" style="width:100%; border:none; background:none; color:#ef4444; margin-top:20px; font-weight:700; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> Delete Customer</button>
     </div>
 </div>
 
@@ -111,7 +110,6 @@
         if(cached) {
             allUsers = JSON.parse(cached);
             render();
-            document.getElementById('lastUpdateTime').innerText = "অফলাইন মোড";
         }
         load();
     };
@@ -125,10 +123,11 @@
     async function load() {
         try {
             const r = await fetch(`${API_URL}/get_all_users`);
-            allUsers = await r.json();
+            const data = await r.json();
+            // ডাটা রিভার্স করা হয়েছে যাতে নতুনগুলো আগে থাকে
+            allUsers = Array.isArray(data) ? data : [];
             localStorage.setItem('isp_data', JSON.stringify(allUsers));
             render();
-            document.getElementById('lastUpdateTime').innerText = "অনলাইন";
         } catch(e) { showToast("সার্ভার অফলাইন!"); }
     }
 
@@ -143,31 +142,39 @@
             (u.billing_id && u.billing_id.toString().includes(q))
         );
 
-        if(currentTab === 'home') filtered = filtered.filter(u => u.user_id.toString().length === 7);
-        else if(currentTab === 'hot') filtered = filtered.filter(u => u.user_id.toString().length === 11);
+        if(currentTab === 'home') {
+            filtered = filtered.filter(u => u.user_id.toString().length === 7 || (u.billing_id && u.billing_id.toString().trim() !== ""));
+        } else if(currentTab === 'hot') {
+            filtered = filtered.filter(u => u.user_id.toString().length === 11 && (!u.billing_id || u.billing_id.toString().trim() === ""));
+        }
 
-        // Sorting Logic
-        if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
-        else if(sort === 'oldest') filtered.reverse(); // Default is newest first
+        // Sorting
+        if(sort === 'name') filtered.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+        else if(sort === 'newest') filtered.reverse();
 
         let html = '';
         filtered.forEach(u => {
-            const isHome = u.user_id.toString().length === 7;
+            const uId = u.user_id.toString();
+            const bId = u.billing_id ? u.billing_id.toString() : "";
+            const isHome = uId.length === 7 || bId !== "";
             const isExp = u.expire ? new Date(parseDate(u.expire)) < new Date() : false;
             
             html += `
-                <div class="user-card ${isHome?'card-home':'card-hotspot'}" onclick="openDialog('${u.user_id}')">
-                    ${u.billing_id ? `<div class="b-id-tag">BILLING: ${u.billing_id}</div>` : ''}
-                    <div style="display:flex; justify-content:space-between">
-                        <span class="user-name">${u.name || 'নতুন ইউজার'}</span>
-                        <span class="status-pill ${isExp?'pill-exp':'pill-active'}">${u.expire ? u.expire.split(' ')[0] : '...'}</span>
+                <div class="user-card ${isHome?'card-home':'card-hotspot'}" onclick="openDialog('${uId}')">
+                    ${bId ? `<div class="b-id-tag"><i class="fa-solid fa-receipt"></i> Billing: ${bId}</div>` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="user-name">${u.name || 'অপেক্ষা করুন (সিঙ্ক প্রয়োজন)'}</span>
+                        <span class="status-pill ${isExp?'pill-exp':'pill-active'}">
+                            <i class="fa-solid ${isExp?'fa-clock-rotate-left':'fa-check-circle'}"></i> ${u.expire ? u.expire.split(' ')[0] : '...'}
+                        </span>
                     </div>
-                    <div style="font-size:11px; opacity:0.7; margin-top:5px;">
-                        <i class="fa-solid fa-id-badge"></i> ${u.user_id} | <i class="fa-solid fa-box"></i> ${u.package || 'আপডেট করুন'}
+                    <div style="font-size:12px; opacity:0.7; margin-top:8px; display:flex; gap:15px;">
+                        <span><i class="fa-solid fa-fingerprint"></i> ${uId}</span>
+                        <span><i class="fa-solid fa-box-open"></i> ${u.package || 'আপডেট করুন'}</span>
                     </div>
                 </div>`;
         });
-        container.innerHTML = html || '<p style="text-align:center; opacity:0.5">কোন তথ্য পাওয়া যায়নি</p>';
+        container.innerHTML = html || '<p style="text-align:center; padding:40px; opacity:0.5;">কোন ইউজার পাওয়া যায়নি!</p>';
     }
 
     function handleInput() {
@@ -179,36 +186,36 @@
 
     async function actionAdd() {
         const id = document.getElementById('searchInput').value;
-        showLoader("ইউজার যোগ করা হচ্ছে...");
+        showLoader("অনলাইন থেকে তথ্য আনা হচ্ছে...");
         try {
             const r = await fetch(`${API_URL}/fetch_user?id=${id}`);
             await r.json();
             await load();
             clearSearch();
-            showToast("সফলভাবে যোগ হয়েছে!");
+            showToast("সাফল্যের সাথে যোগ হয়েছে!");
         } catch(e) { showToast("ত্রুটি হয়েছে!"); }
         hideLoader();
     }
 
     async function syncData() {
-        showLoader("গুগল শিট সিঙ্ক হচ্ছে...");
+        showLoader("গুগল শিট ও পোর্টাল সিঙ্ক হচ্ছে...");
         try {
             const res = await fetch(`${API_URL}/sync_sheet`);
             await res.json();
             await load();
-            showToast("সব তথ্য আপডেট হয়েছে!");
+            showToast("সিঙ্কিং সম্পন্ন হয়েছে!");
         } catch(e) { showToast("সিঙ্ক এরর!"); }
         hideLoader();
     }
 
     async function confirmDelete() {
-        if(!confirm("নিশ্চিত ডিলিট করবেন?")) return;
-        showLoader("মুছে ফেলা হচ্ছে...");
+        if(!confirm("আপনি কি নিশ্চিতভাবে এই ইউজারটি মুছতে চান?")) return;
+        showLoader("ডাটাবেজ থেকে মুছে ফেলা হচ্ছে...");
         try {
             await fetch(`${API_URL}/delete_user?id=${activeId}`);
             await load();
             document.getElementById('dialog').style.display = 'none';
-            showToast("ডিলিট সফল!");
+            showToast("সফলভাবে ডিলিট হয়েছে!");
         } catch(e) { showToast("এরর!"); }
         hideLoader();
     }
@@ -216,9 +223,20 @@
     function openDialog(id) {
         activeId = id;
         const u = allUsers.find(x => x.user_id.toString() === id.toString());
+        const bId = u.billing_id ? u.billing_id.toString() : "";
+        
         document.getElementById('mName').innerText = u.name || "নতুন ইউজার";
-        document.getElementById('mDetails').innerHTML = `<b>ID:</b> ${u.user_id}<br><b>প্যাকেজ:</b> ${u.package}<br><b>মেয়াদ:</b> ${u.expire}`;
-        document.getElementById('payLink').href = `https://ispbill.com/pay.php?c=1021&q=${u.user_id}`;
+        document.getElementById('mDetails').innerHTML = `
+            <div style="margin-bottom:8px"><i class="fa-solid fa-id-card"></i> <b>User ID:</b> ${u.user_id}</div>
+            <div style="margin-bottom:8px"><i class="fa-solid fa-receipt"></i> <b>Billing ID:</b> ${bId || 'N/A'}</div>
+            <div style="margin-bottom:8px"><i class="fa-solid fa-box"></i> <b>Package:</b> ${u.package}</div>
+            <div style="margin-bottom:8px"><i class="fa-solid fa-calendar-days"></i> <b>Expires:</b> ${u.expire}</div>
+        `;
+        
+        // পেমেন্ট লিঙ্ক লজিক: বিলিং আইডি থাকলে সেটি দিয়ে, না থাকলে মোবাইল নাম্বার দিয়ে
+        const payQuery = (bId !== "" && bId !== "undefined") ? bId : u.user_id;
+        document.getElementById('payLink').href = `https://ispbill.com/pay.php?c=1021&q=${payQuery}`;
+        
         document.getElementById('dialog').style.display = 'flex';
     }
 
