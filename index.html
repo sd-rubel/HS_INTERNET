@@ -1,86 +1,253 @@
-import requests
-import os
-from flask import Flask, jsonify, request
-from bs4 import BeautifulSoup
-from flask_cors import CORS
-from concurrent.futures import ThreadPoolExecutor
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SD STORE AND TECH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --accent: #6366f1; --header-h: 220px; }
+        [data-theme="dark"] { --bg: #020617; --card: #0f172a; --text: #f1f5f9; --accent: #818cf8; }
+        body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-top: var(--header-h); transition: 0.3s; }
+        
+        #loader { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; flex-direction:column; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px); }
+        .spinner { width:40px; height:40px; border:4px solid #fff; border-top-color:var(--accent); border-radius:50%; animation:spin 1s linear infinite; margin-bottom:10px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-app = Flask(__name__)
-CORS(app)
+        header { position:fixed; top:0; left:0; right:0; background:linear-gradient(135deg, #4f46e5, #7c3aed); padding:10px 15px; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+        .top-bar { display:flex; justify-content:space-between; align-items:center; }
+        .shop-name { font-size:16px; font-weight:800; color:#fff; }
+        
+        .sort-bar { display:flex; gap:10px; margin-top:10px; background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:8px; align-items:center; }
+        .sort-bar select { background:none; border:none; color:white; font-size:12px; outline:none; flex:1; }
 
-GAS_URL = "https://script.google.com/macros/s/AKfycbxNKUunxKrDFqQi7cn_EzoQGNsqkb9cdkqRR3JeCVXPPHyiPml4YaLUdFfhBfCMBZv9/exec"
+        .tabs { display:flex; gap:5px; margin:12px 0; }
+        .tab { flex:1; padding:10px 5px; text-align:center; background:rgba(255,255,255,0.15); border-radius:10px; font-size:12px; cursor:pointer; color:#fff; font-weight:700; transition:0.2s; white-space: nowrap; }
+        .tab.active { background:#fff; color:#4f46e5; transform: scale(1.05); }
 
-# দ্রুত ডাটা পাঠানোর জন্য সেশন ব্যবহার
-session = requests.Session()
+        .search-box { position:relative; }
+        .search-box input { width:100%; padding:12px 40px; border-radius:12px; border:none; outline:none; font-size:14px; box-sizing:border-box; }
+        .search-icon { position:absolute; left:12px; top:14px; color:#94a3b8; }
+        .clear-btn { position:absolute; right:12px; top:10px; background:none; border:none; color:#ef4444; font-size:22px; cursor:pointer; display:none; }
 
-def scrape_isp(q_id):
-    url = f"https://ispbill.com/pay.php?c=1021&q={q_id}"
-    try:
-        r = session.get(url, timeout=5)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        all_td = soup.find_all('td')
-        if len(all_td) > 13:
-            u_id = all_td[3].get_text(strip=True)
-            b_id = str(q_id) if len(str(q_id)) == 7 else ""
-            
-            # ১১ ডিজিট পূর্ণ করা (০ যুক্ত করা)
-            u_id_str = str(u_id)
-            if len(u_id_str) == 10 and u_id_str[0] != '0':
-                u_id_str = '0' + u_id_str
+        .container { padding:15px; }
+        .user-card { background:var(--card); border-radius:18px; padding:15px; margin-bottom:12px; border-left:6px solid var(--accent); box-shadow:0 4px 10px rgba(0,0,0,0.05); animation:fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .card-home { border-left-color: #0ea5e9; }
+        .card-hotspot { border-left-color: #f59e0b; }
+        
+        .user-name { font-size:15px; font-weight:700; display:block; margin-bottom:5px; }
+        .status-pill { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:800; }
+        .pill-exp { background:#fee2e2; color:#ef4444; }
+        .pill-active { background:#dcfce7; color:#22c55e; }
 
-            return {
-                "name": all_td[1].get_text(strip=True),
-                "user_id": u_id_str,
-                "billing_id": str(b_id),
-                "package": all_td[7].get_text(strip=True),
-                "expire": all_td[13].get_text(strip=True)
-            }
-    except:
-        pass
-    return None
+        #addBtn { width:100%; margin-top:8px; padding:12px; border-radius:12px; border:none; font-weight:700; background:#22c55e; color:white; display:none; cursor:pointer; }
+        #toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:10px 20px; border-radius:20px; font-size:13px; display:none; z-index:9999; }
+        
+        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px); }
+        .modal-content { background:var(--card); width:100%; max-width:340px; border-radius:20px; padding:25px; position:relative; }
+    </style>
+</head>
+<body>
 
-def sync_worker(u):
-    name = str(u.get('name', '')).strip()
-    uid = str(u.get('user_id', '')).strip()
-    bid = str(u.get('billing_id', '')).strip()
+<div id="loader"><div class="spinner"></div><b id="loaderText">প্রসেসিং...</b></div>
+
+<header>
+    <div class="top-bar">
+        <h1 class="shop-name"><i class="fa-solid fa-bolt"></i> SD STORE AND TECH</h1>
+        <div style="display:flex; gap:12px">
+            <button onclick="toggleTheme()" style="background:none; border:none; color:white; font-size:18px; cursor:pointer;"><i id="tIcon" class="fa-solid fa-moon"></i></button>
+            <button onclick="syncData()" style="background:#fff; color:#4f46e5; border:none; padding:5px 12px; border-radius:8px; font-weight:800; font-size:11px; cursor:pointer;">আপডেট</button>
+        </div>
+    </div>
     
-    # যদি নাম না থাকে তবেই আপডেট করবে
-    if name == "" or name == "undefined":
-        sid = bid if (bid != "" and bid != "undefined") else uid
-        if sid:
-            fresh = scrape_isp(sid)
-            if fresh:
-                session.post(GAS_URL, json={"action": "add_or_update", **fresh})
+    <div class="sort-bar">
+        <select id="sortType" onchange="render()">
+            <option value="newest">নতুন ইউজার আগে</option>
+            <option value="name">নাম অনুযায়ী (A-Z)</option>
+        </select>
+        <div id="statusInfo" style="font-size:10px; color:#fff; opacity:0.8">লাইভ ডাটা</div>
+    </div>
 
-@app.route('/sync_sheet')
-def sync_sheet():
-    try:
-        users = session.get(GAS_URL).json()
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            executor.map(sync_worker, users)
-        return jsonify({"success": True})
-    except:
-        return jsonify({"success": False})
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('all', this)" id="tab-all">All (0)</div>
+        <div class="tab" onclick="switchTab('home', this)" id="tab-home">Homeline (0)</div>
+        <div class="tab" onclick="switchTab('hot', this)" id="tab-hot">Hotspot (0)</div>
+    </div>
 
-@app.route('/delete_user')
-def delete_user():
-    id_param = request.args.get('id')
-    # মোবাইল নম্বর বা বিলিং আইডি যাই হোক স্ট্রিং হিসেবে ডিলিট রিকোয়েস্ট পাঠানো
-    r = session.post(GAS_URL, json={"action": "delete", "user_id": str(id_param)})
-    return r.text
+    <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" onkeyup="handleInput()" placeholder="ID বা নাম দিয়ে খুঁজুন...">
+        <button class="clear-btn" id="clearBtn" onclick="clearSearch()">&times;</button>
+        <button id="addBtn" onclick="actionAdd()"><i class="fa-solid fa-user-plus"></i> Add New User</button>
+    </div>
+</header>
 
-@app.route('/get_all_users')
-def get_all_users():
-    return session.get(GAS_URL).text
+<div class="container" id="userList"></div>
 
-@app.route('/fetch_user')
-def fetch_user():
-    id_param = request.args.get('id')
-    new_data = scrape_isp(id_param)
-    if new_data:
-        session.post(GAS_URL, json={"action": "add_or_update", **new_data})
-        return jsonify({"success": True, **new_data})
-    return jsonify({"success": False})
+<div class="modal" id="dialog" onclick="this.style.display='none'">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3 id="mName" style="margin:0 0 15px 0; color:var(--accent);"></h3>
+        <div id="mDetails" style="font-size:14px; line-height:1.8; border-bottom:1px solid #eee; padding-bottom:15px;"></div>
+        <a id="payLink" href="#" target="_blank" style="display:block; background:#10b981; color:#fff; text-align:center; padding:15px; border-radius:12px; text-decoration:none; margin-top:20px; font-weight:800; font-size:16px;">Pay Now</a>
+        <button onclick="confirmDelete()" style="width:100%; border:none; background:none; color:#ef4444; margin-top:15px; font-weight:700; cursor:pointer;"><i class="fa-solid fa-trash"></i> Delete User</button>
+    </div>
+</div>
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+<div id="toast"></div>
+
+<script>
+    let allUsers = [], currentTab = 'all', activeId = null;
+    const API_URL = "https://hs-internet.onrender.com";
+
+    window.onload = () => { applyTheme(); load(); };
+
+    // আইডি ফিক্স করা (০ যোগ করা)
+    function formatUserId(id) {
+        let s = id.toString().trim();
+        if(s.length === 10 && s[0] !== '0') s = '0' + s;
+        return s;
+    }
+
+    async function load() {
+        try {
+            const r = await fetch(`${API_URL}/get_all_users`);
+            const data = await r.json();
+            allUsers = data.map(u => ({
+                ...u,
+                user_id: formatUserId(u.user_id),
+                billing_id: u.billing_id ? u.billing_id.toString().trim() : ""
+            }));
+            localStorage.setItem('isp_data', JSON.stringify(allUsers));
+            updateUI();
+        } catch(e) {
+            const cached = localStorage.getItem('isp_data');
+            if(cached) { allUsers = JSON.parse(cached); updateUI(); }
+            showToast("সার্ভার অফলাইন!");
+        }
+    }
+
+    function updateUI() {
+        const homeUsers = allUsers.filter(u => u.user_id.length === 7 || (u.billing_id && u.billing_id !== ""));
+        const hotUsers = allUsers.filter(u => u.user_id.length === 11 && (!u.billing_id || u.billing_id === ""));
+        
+        document.getElementById('tab-all').innerText = `All (${allUsers.length})`;
+        document.getElementById('tab-home').innerText = `Homeline (${homeUsers.length})`;
+        document.getElementById('tab-hot').innerText = `Hotspot (${hotUsers.length})`;
+        render();
+    }
+
+    function render() {
+        const container = document.getElementById('userList');
+        const q = document.getElementById('searchInput').value.trim().toLowerCase();
+        const sort = document.getElementById('sortType').value;
+        
+        let filtered = allUsers.filter(u => 
+            (u.name && u.name.toLowerCase().includes(q)) || 
+            (u.user_id.includes(q)) || (u.billing_id && u.billing_id.includes(q))
+        );
+
+        if(currentTab === 'home') {
+            filtered = filtered.filter(u => u.user_id.length === 7 || (u.billing_id && u.billing_id !== ""));
+        } else if(currentTab === 'hot') {
+            filtered = filtered.filter(u => u.user_id.length === 11 && (!u.billing_id || u.billing_id === ""));
+        }
+
+        if(sort === 'name') filtered.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+        else filtered.reverse();
+
+        let html = '';
+        filtered.forEach(u => {
+            const isHome = u.user_id.length === 7 || (u.billing_id && u.billing_id !== "");
+            const isExp = u.expire ? new Date(parseDate(u.expire)) < new Date() : false;
+            
+            html += `
+                <div class="user-card ${isHome?'card-home':'card-hotspot'}" onclick="openDialog('${u.user_id}')">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div>
+                            <span class="user-name">${u.name || 'অপেক্ষা করুন (সিঙ্ক হবে)'}</span>
+                            <span style="font-size:11px; opacity:0.7;">ID: ${u.user_id} ${u.billing_id ? '| Bill: '+u.billing_id : ''}</span>
+                        </div>
+                        <span class="status-pill ${isExp?'pill-exp':'pill-active'}">${u.expire ? u.expire.split(' ')[0] : 'N/A'}</span>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html || '<p style="text-align:center; padding:20px; opacity:0.5;">কোন ইউজার নেই</p>';
+    }
+
+    function openDialog(id) {
+        activeId = id;
+        const u = allUsers.find(x => x.user_id === id);
+        const bId = u.billing_id || "";
+        document.getElementById('mName').innerText = u.name || "নতুন ইউজার";
+        document.getElementById('mDetails').innerHTML = `
+            <b>User ID:</b> ${u.user_id}<br>
+            <b>Billing ID:</b> ${bId || 'N/A'}<br>
+            <b>Package:</b> ${u.package || 'Checking...'}<br>
+            <b>Expire:</b> ${u.expire || 'Checking...'}`;
+        
+        // পেমেন্ট লিঙ্ক লজিক
+        const payQuery = (bId !== "" && bId !== "undefined") ? bId : u.user_id;
+        document.getElementById('payLink').href = `https://ispbill.com/pay.php?c=1021&q=${payQuery}`;
+        document.getElementById('dialog').style.display = 'flex';
+    }
+
+    async function confirmDelete() {
+        if(!confirm("ইউজারটি ডিলিট করতে চান?")) return;
+        showLoader("মুছে ফেলা হচ্ছে...");
+        try {
+            await fetch(`${API_URL}/delete_user?id=${activeId}`);
+            await load();
+            document.getElementById('dialog').style.display = 'none';
+            showToast("সফলভাবে ডিলিট হয়েছে!");
+        } catch(e) { showToast("ডিলিট এরর!"); }
+        hideLoader();
+    }
+
+    async function syncData() {
+        showLoader("সিঙ্ক হচ্ছে... অপেক্ষা করুন");
+        try {
+            await fetch(`${API_URL}/sync_sheet`);
+            await load();
+            showToast("সব তথ্য আপডেট হয়েছে!");
+        } catch(e) { showToast("সিঙ্ক এরর!"); }
+        hideLoader();
+    }
+
+    async function actionAdd() {
+        const id = document.getElementById('searchInput').value.trim();
+        showLoader("তথ্য খোঁজা হচ্ছে...");
+        try {
+            await fetch(`${API_URL}/fetch_user?id=${id}`);
+            await load();
+            clearSearch();
+            showToast("যোগ করা হয়েছে!");
+        } catch(e) { showToast("এরর হয়েছে!"); }
+        hideLoader();
+    }
+
+    function handleInput() {
+        const val = document.getElementById('searchInput').value.trim();
+        document.getElementById('clearBtn').style.display = val.length > 0 ? 'block' : 'none';
+        document.getElementById('addBtn').style.display = (val.length >= 7) ? 'block' : 'none';
+        render();
+    }
+
+    function switchTab(t, el) {
+        currentTab = t;
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        el.classList.add('active');
+        render();
+    }
+
+    function showLoader(t) { document.getElementById('loaderText').innerText = t; document.getElementById('loader').style.display = 'flex'; }
+    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
+    function clearSearch() { document.getElementById('searchInput').value = ''; handleInput(); }
+    function parseDate(s) { try { const [d, t] = s.split(' '); const [day, mon, yr] = d.split('-'); return `${yr}-${mon}-${day}T${t}`; } catch(e) { return "1970-01-01"; } }
+    function toggleTheme() { const t = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark'; localStorage.setItem('theme', t); applyTheme(); }
+    function applyTheme() { const t = localStorage.getItem('theme') || 'light'; document.body.setAttribute('data-theme', t); document.getElementById('tIcon').className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; }
+</script>
+</body>
+</html>
