@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HS INTERNET | Management</title>
+    <title>HS INTERNET | Management Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,24 +11,27 @@
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #cbd5e1; /* Deep slate-blue body for high contrast */
+            background: #cbd5e1; 
         }
 
-        /* Premium Gradient - Not Black */
+        /* Premium Indigo-Violet Gradient Header */
         .premium-header {
             background: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #7e22ce 100%);
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+            box-shadow: 0 10px 30px -5px rgba(67, 56, 202, 0.4);
         }
 
+        /* Card Design with Top Border Accent */
         .premium-card {
             background: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 1);
+            border-top: 4px solid #6366f1; /* Thematic Top Border */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
         .premium-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+            border-top-color: #a855f7; /* Color shift on hover */
         }
 
         .bg-icon-watermark {
@@ -36,7 +39,7 @@
             right: -10px;
             bottom: -10px;
             font-size: 5rem;
-            opacity: 0.05;
+            opacity: 0.04;
             transform: rotate(-10deg);
             pointer-events: none;
         }
@@ -55,12 +58,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-inner">
+                    <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-lg">
                         <i class="fa-solid fa-tower-broadcast text-white text-lg"></i>
                     </div>
                     <div>
                         <h1 class="text-xl font-extrabold tracking-tight">HS INTERNET</h1>
-                        <p id="lastSyncDisplay" class="text-[9px] text-indigo-100 font-bold uppercase tracking-widest opacity-80">Syncing...</p>
+                        <p id="lastSyncDisplay" class="text-[9px] text-indigo-100 font-bold uppercase tracking-widest opacity-80 italic">Ready</p>
                     </div>
                 </div>
 
@@ -72,24 +75,24 @@
                         <option value="name-desc" class="text-slate-900">NAME (Z-A)</option>
                     </select>
 
-                    <button onclick="refreshData(true)" class="bg-white/10 hover:bg-white/20 border border-white/20 p-2.5 rounded-xl transition-all active:scale-90">
+                    <button onclick="refreshData(true)" class="bg-white/10 hover:bg-white/20 border border-white/20 p-2.5 rounded-xl transition-all active:scale-90" title="Sync with Google Sheets">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate text-white"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="pb-4">
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
+            <div class="pb-5">
+                <div class="relative group">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50 group-focus-within:text-white transition-colors"></i>
                     <input type="text" id="searchInput" onkeyup="filterData()" 
                            placeholder="Search Billing ID, Name, or Mobile..." 
-                           class="w-full pl-11 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/40 transition-all outline-none text-sm text-white placeholder-white/50">
+                           class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-2xl focus:ring-2 focus:ring-white/40 transition-all outline-none text-sm text-white placeholder-white/40">
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-44 pb-20">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-48 pb-20">
         <div id="loader" class="hidden flex flex-col items-center justify-center py-20">
             <div class="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
         </div>
@@ -99,15 +102,22 @@
     </main>
 
     <div id="userModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="relative bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="relative bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div class="h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+            
             <div class="p-8">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <h2 id="modalName" class="text-2xl font-bold text-slate-900">---</h2>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-[10px] font-black bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded text-uppercase">BILLING ID</span>
-                            <p id="modalBillingID" class="text-indigo-600 font-bold text-sm tracking-widest"></p>
+                <div class="flex justify-between items-start mb-8">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                            <i class="fa-solid fa-user-tie text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 id="modalName" class="text-2xl font-bold text-slate-900">---</h2>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[9px] font-black bg-indigo-600 text-white px-1.5 py-0.5 rounded uppercase">BILLING ID</span>
+                                <p id="modalBillingID" class="text-indigo-600 font-bold text-sm tracking-widest"></p>
+                            </div>
                         </div>
                     </div>
                     <button onclick="closeModal()" class="text-slate-300 hover:text-slate-900 transition-colors">
@@ -115,33 +125,33 @@
                     </button>
                 </div>
                 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-id-badge text-slate-400"></i>
+                            <i class="fa-solid fa-fingerprint text-indigo-400"></i>
                             <span class="text-xs font-bold text-slate-400 uppercase">User ID</span>
                         </div>
-                        <p id="modalUserID" class="text-slate-800 font-bold"></p>
+                        <p id="modalUserID" class="text-slate-800 font-bold text-sm"></p>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-phone text-slate-400"></i>
+                            <i class="fa-solid fa-phone-volume text-indigo-400"></i>
                             <span class="text-xs font-bold text-slate-400 uppercase">Mobile</span>
                         </div>
-                        <p id="modalMobile" class="text-slate-800 font-bold"></p>
+                        <p id="modalMobile" class="text-slate-800 font-bold text-sm"></p>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-bolt text-slate-400"></i>
-                            <span class="text-xs font-bold text-slate-400 uppercase">Plan</span>
+                            <i class="fa-solid fa-receipt text-indigo-400"></i>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Active Package</span>
                         </div>
-                        <p id="modalPackage" class="text-slate-800 font-bold text-indigo-600"></p>
+                        <p id="modalPackage" class="text-indigo-600 font-bold text-sm"></p>
                     </div>
                 </div>
 
-                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl mt-8 hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95">
-                    <i class="fa-solid fa-receipt"></i>
-                    PAY NOW
+                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl mt-10 hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95 group">
+                    <i class="fa-solid fa-money-bill-transfer group-hover:animate-bounce"></i>
+                    PROCEED TO PAYMENT
                 </a>
             </div>
         </div>
@@ -162,7 +172,7 @@
 
             if (cachedData && !forceSync) {
                 userData = JSON.parse(cachedData);
-                syncDisplay.innerText = "Updated: " + lastSync;
+                syncDisplay.innerText = "Synced: " + lastSync;
                 sortAndRender();
                 return;
             }
@@ -179,7 +189,7 @@
                 localStorage.setItem('hs_user_data', JSON.stringify(data));
                 localStorage.setItem('hs_last_sync', timestamp);
 
-                syncDisplay.innerText = "Updated: " + timestamp;
+                syncDisplay.innerText = "Synced: " + timestamp;
                 sortAndRender();
             } catch (err) {
                 console.error(err);
@@ -194,11 +204,8 @@
             const order = document.getElementById('sortOrder').value;
             let dataToSort = [...userData];
 
-            if (order === 'name-asc') {
-                dataToSort.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (order === 'name-desc') {
-                dataToSort.sort((a, b) => b.name.localeCompare(a.name));
-            }
+            if (order === 'name-asc') dataToSort.sort((a, b) => a.name.localeCompare(b.name));
+            else if (order === 'name-desc') dataToSort.sort((a, b) => b.name.localeCompare(a.name));
 
             filteredData = dataToSort;
             renderGrid(filteredData);
@@ -207,30 +214,38 @@
         function renderGrid(data) {
             const container = document.getElementById('gridContainer');
             container.innerHTML = data.map((user, index) => `
-                <div onclick="openModal(${index})" class="premium-card p-6 rounded-[2rem] relative overflow-hidden cursor-pointer group">
-                    <i class="fa-solid fa-satellite-dish bg-icon-watermark text-indigo-600"></i>
+                <div onclick="openModal(${index})" class="premium-card p-6 rounded-[2rem] relative overflow-hidden cursor-pointer group shadow-sm border border-slate-200/50">
+                    <i class="fa-solid fa-wifi bg-icon-watermark text-indigo-500"></i>
                     
-                    <div class="mb-4">
-                        <h3 class="text-base font-bold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">${user.name}</h3>
-                        <p class="text-[10px] font-bold text-slate-400 mt-1 tracking-widest uppercase">Billing ID: <span class="text-indigo-500">${user.id_num}</span></p>
+                    <div class="mb-5 flex items-start gap-3">
+                        <div class="mt-1 text-indigo-400 group-hover:text-indigo-600 transition-colors">
+                            <i class="fa-solid fa-circle-user text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">${user.name}</h3>
+                            <p class="text-[10px] font-bold text-slate-400 mt-1 tracking-widest uppercase">
+                                <i class="fa-solid fa-barcode mr-1 text-[8px]"></i> Billing ID: <span class="text-indigo-500">${user.id_num}</span>
+                            </p>
+                        </div>
                     </div>
                     
-                    <div class="space-y-2">
-                        <div class="flex items-center gap-2 text-slate-600">
-                            <i class="fa-solid fa-mobile-button text-[10px] text-slate-400"></i>
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-3 text-slate-600">
+                            <i class="fa-solid fa-phone text-[10px] text-slate-400"></i>
                             <span class="text-sm font-semibold">${user.mobile}</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-full uppercase">
+                        <div class="flex items-center gap-3">
+                            <div class="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase flex items-center gap-1.5">
+                                <i class="fa-solid fa-microchip text-[8px]"></i>
                                 ${user.pakage}
-                            </span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-6 flex justify-between items-center">
-                        <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">View Details</span>
-                        <div class="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
-                            <i class="fa-solid fa-arrow-right-long"></i>
+                    <div class="mt-7 pt-4 border-t border-slate-50 flex justify-between items-center">
+                        <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Details</span>
+                        <div class="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
                         </div>
                     </div>
                 </div>
