@@ -19,11 +19,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center gap-2">
-                    <div class="bg-blue-600 p-2 rounded-lg text-white">
-                        <i class="fa fa-bolt text-xl"></i>
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                        <i class="fa fa-users text-xl"></i>
                     </div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                        ISP Billing Manager
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-600">
+                        User Database
                     </span>
                 </div>
                 
@@ -31,12 +31,12 @@
                     <div class="relative">
                         <input type="text" id="searchInput" onkeyup="filterData()" 
                                placeholder="Search name, mobile, or ID..." 
-                               class="w-full bg-slate-100 border-none rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 transition-all">
+                               class="w-full bg-slate-100 border-none rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 transition-all">
                         <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     </div>
                 </div>
 
-                <button onclick="refreshData()" class="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-2xl font-semibold transition-all text-slate-700 shadow-sm">
+                <button onclick="refreshData()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-2xl font-semibold transition-all shadow-md shadow-indigo-100">
                     <i id="syncIcon" class="fa fa-arrows-rotate"></i> Update Data
                 </button>
             </div>
@@ -44,49 +44,31 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="md:hidden mb-6">
-            <input type="text" id="searchInputMobile" onkeyup="filterData(true)" 
-                   placeholder="Search..." 
-                   class="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 shadow-sm">
-        </div>
+        <div id="errorMessage" class="hidden mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl"></div>
 
         <div id="gridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <div class="skeleton h-48 rounded-3xl"></div>
             <div class="skeleton h-48 rounded-3xl"></div>
             <div class="skeleton h-48 rounded-3xl"></div>
             <div class="skeleton h-48 rounded-3xl"></div>
         </div>
     </main>
 
-    <div id="userModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 px-6 py-8 text-white relative">
-                    <button onclick="closeModal()" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
-                        <i class="fa fa-times text-xl"></i>
-                    </button>
-                    <div id="modalInitials" class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl font-bold mb-4"></div>
+    <div id="userModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+            <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-md transform transition-all">
+                <div class="bg-indigo-600 px-6 py-8 text-white">
+                    <div id="modalInitials" class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold mb-4"></div>
                     <h3 id="modalName" class="text-2xl font-bold">---</h3>
-                    <p id="modalID" class="text-blue-100"></p>
+                    <p id="modalID" class="text-indigo-100"></p>
                 </div>
-                <div class="px-6 py-6 space-y-4 bg-white">
-                    <div class="flex justify-between border-b border-slate-50 pb-3">
-                        <span class="text-slate-500">Mobile Number</span>
-                        <span id="modalMobile" class="font-semibold text-slate-800"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-50 pb-3">
-                        <span class="text-slate-500">Package Type</span>
-                        <span id="modalPackage" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase"></span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-50 pb-3">
-                        <span class="text-slate-500">Internal ID</span>
-                        <span id="modalIdNum" class="font-mono font-bold text-slate-800"></span>
-                    </div>
+                <div class="px-6 py-6 space-y-4">
+                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Mobile</span><span id="modalMobile" class="font-bold"></span></div>
+                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Package</span><span id="modalPackage" class="font-bold text-indigo-600"></span></div>
+                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500">ID Number</span><span id="modalIdNum" class="font-mono"></span></div>
                     
-                    <a id="payNowBtn" href="#" target="_blank" class="mt-6 flex items-center justify-center gap-3 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-green-200">
-                        <i class="fa fa-credit-card"></i> Pay Bill Now
+                    <a id="payNowBtn" href="#" target="_blank" class="mt-4 flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl transition-all">
+                        <i class="fa fa-credit-card"></i> Pay Now
                     </a>
                 </div>
             </div>
@@ -96,76 +78,66 @@
     <script>
         let userData = [];
 
-        // Initial Load
         window.onload = refreshData;
 
         function refreshData() {
             const icon = document.getElementById('syncIcon');
+            const errorDiv = document.getElementById('errorMessage');
             icon.classList.add('fa-spin');
+            errorDiv.classList.add('hidden');
             
             google.script.run.withSuccessHandler(data => {
+                icon.classList.remove('fa-spin');
+                if (data.error) {
+                    errorDiv.innerText = data.error;
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
                 userData = data;
                 renderGrid(data);
-                icon.classList.remove('fa-spin');
             }).getSheetData();
         }
 
         function renderGrid(data) {
             const container = document.getElementById('gridContainer');
-            if (data.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">No users found.</div>`;
-                return;
-            }
-
             container.innerHTML = data.map((user, index) => `
-                <div onclick="openModal(${index})" class="user-card bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <i class="fa fa-arrow-right text-blue-500"></i>
-                    </div>
+                <div onclick="openModal(${index})" class="user-card bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-200">
                     <div class="flex flex-col items-center text-center">
-                        <div class="w-14 h-14 bg-gradient-to-tr from-blue-50 to-indigo-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4 border border-blue-100">
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-3">
                             ${user.name ? user.name.charAt(0) : '?'}
                         </div>
-                        <h3 class="font-bold text-slate-800 truncate w-full">${user.name}</h3>
-                        <p class="text-sm text-slate-500 mb-4">ID: ${user.user_id}</p>
-                        <div class="w-full pt-4 border-t border-slate-50 flex justify-between items-center">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Package</span>
-                            <span class="text-xs font-bold text-blue-600">${user.pakage}</span>
-                        </div>
+                        <h3 class="font-bold text-slate-800 truncate w-full">${user.name || 'N/A'}</h3>
+                        <p class="text-xs text-slate-500 mb-4">ID: ${user.user_id || 'N/A'}</p>
+                        <span class="text-[10px] px-3 py-1 bg-slate-100 rounded-full font-bold uppercase text-slate-600">${user.pakage || 'No Package'}</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        function filterData(isMobile = false) {
-            const val = document.getElementById(isMobile ? 'searchInputMobile' : 'searchInput').value.toLowerCase();
+        function filterData() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
             const filtered = userData.filter(u => 
-                u.name.toLowerCase().includes(val) || 
-                u.mobile.includes(val) || 
-                u.id_num.includes(val)
+                (u.name && u.name.toLowerCase().includes(val)) || 
+                (u.mobile && u.mobile.includes(val)) || 
+                (u.id_num && u.id_num.includes(val))
             );
             renderGrid(filtered);
         }
 
         function openModal(index) {
             const user = userData[index];
-            document.getElementById('modalName').innerText = user.name;
-            document.getElementById('modalID').innerText = `Customer ID: ${user.user_id}`;
-            document.getElementById('modalMobile').innerText = user.mobile;
-            document.getElementById('modalPackage').innerText = user.pakage;
-            document.getElementById('modalIdNum').innerText = user.id_num;
-            document.getElementById('modalInitials').innerText = user.name.charAt(0);
-            
-            // Set dynamic payment link
+            document.getElementById('modalName').innerText = user.name || 'N/A';
+            document.getElementById('modalID').innerText = `User ID: ${user.user_id || 'N/A'}`;
+            document.getElementById('modalMobile').innerText = user.mobile || 'N/A';
+            document.getElementById('modalPackage').innerText = user.pakage || 'N/A';
+            document.getElementById('modalIdNum').innerText = user.id_num || 'N/A';
+            document.getElementById('modalInitials').innerText = user.name ? user.name.charAt(0) : '?';
             document.getElementById('payNowBtn').href = `https://ispbill.com/pay.php?c=1021&q=${user.id_num}`;
-            
             document.getElementById('userModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
             document.getElementById('userModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
         }
     </script>
 </body>
