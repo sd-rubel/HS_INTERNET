@@ -1,5 +1,1 @@
-flask
-requests
-beautifulsoup4
-flask-cors
-gunicorn
+
