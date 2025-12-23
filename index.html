@@ -11,12 +11,13 @@
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #e2e8f0; /* Deeper body color for contrast */
+            background: #cbd5e1; /* Deep slate-blue body for high contrast */
         }
 
+        /* Premium Gradient - Not Black */
         .premium-header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #7e22ce 100%);
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
         }
 
         .premium-card {
@@ -27,23 +28,25 @@
 
         .premium-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         .bg-icon-watermark {
             position: absolute;
-            right: -15px;
-            bottom: -15px;
-            font-size: 6rem;
-            opacity: 0.03;
-            transform: rotate(-15deg);
+            right: -10px;
+            bottom: -10px;
+            font-size: 5rem;
+            opacity: 0.05;
+            transform: rotate(-10deg);
             pointer-events: none;
         }
 
-        /* Hide scrollbar for clean UI */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -52,46 +55,43 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
-                        <i class="fa-solid fa-tower-cell text-white"></i>
+                    <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-inner">
+                        <i class="fa-solid fa-tower-broadcast text-white text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold tracking-tight">HS INTERNET</h1>
-                        <p id="lastSyncDisplay" class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Initial Loading...</p>
+                        <h1 class="text-xl font-extrabold tracking-tight">HS INTERNET</h1>
+                        <p id="lastSyncDisplay" class="text-[9px] text-indigo-100 font-bold uppercase tracking-widest opacity-80">Syncing...</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <div class="relative group">
-                        <select id="sortOrder" onchange="sortAndRender()" 
-                                class="appearance-none bg-slate-800 border-none text-[11px] font-bold py-2 pl-4 pr-8 rounded-xl cursor-pointer focus:ring-1 focus:ring-indigo-400 transition-all outline-none">
-                            <option value="default">DEFAULT</option>
-                            <option value="name-asc">NAME (A-Z)</option>
-                            <option value="name-desc">NAME (Z-A)</option>
-                        </select>
-                        <i class="fa-solid fa-sort-down absolute right-3 top-2 text-slate-500 pointer-events-none"></i>
-                    </div>
+                    <select id="sortOrder" onchange="sortAndRender()" 
+                            class="custom-select bg-white/10 border border-white/20 text-[11px] font-bold py-2 pl-3 pr-8 rounded-xl cursor-pointer focus:outline-none focus:bg-white/20 transition-all">
+                        <option value="default" class="text-slate-900">DEFAULT</option>
+                        <option value="name-asc" class="text-slate-900">NAME (A-Z)</option>
+                        <option value="name-desc" class="text-slate-900">NAME (Z-A)</option>
+                    </select>
 
-                    <button onclick="refreshData(true)" class="bg-slate-800 hover:bg-slate-700 p-2.5 rounded-xl transition-all active:scale-90" title="Sync Data">
-                        <i id="syncIcon" class="fa-solid fa-rotate text-indigo-400"></i>
+                    <button onclick="refreshData(true)" class="bg-white/10 hover:bg-white/20 border border-white/20 p-2.5 rounded-xl transition-all active:scale-90">
+                        <i id="syncIcon" class="fa-solid fa-arrows-rotate text-white"></i>
                     </button>
                 </div>
             </div>
 
             <div class="pb-4">
                 <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
                     <input type="text" id="searchInput" onkeyup="filterData()" 
-                           placeholder="Search customer name, ID or phone..." 
-                           class="w-full pl-11 pr-4 py-2.5 bg-slate-800/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-sm text-slate-200 placeholder-slate-500">
+                           placeholder="Search Billing ID, Name, or Mobile..." 
+                           class="w-full pl-11 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/40 transition-all outline-none text-sm text-white placeholder-white/50">
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-40 pb-20">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-44 pb-20">
         <div id="loader" class="hidden flex flex-col items-center justify-center py-20">
-            <div class="w-10 h-10 border-4 border-slate-300 border-t-indigo-500 rounded-full animate-spin"></div>
+            <div class="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
         </div>
 
         <div id="gridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -99,13 +99,16 @@
     </main>
 
     <div id="userModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeModal()"></div>
         <div class="relative bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden">
             <div class="p-8">
                 <div class="flex justify-between items-start mb-6">
                     <div>
                         <h2 id="modalName" class="text-2xl font-bold text-slate-900">---</h2>
-                        <p id="modalID" class="text-indigo-600 font-bold text-xs mt-1 uppercase tracking-widest"></p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] font-black bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded text-uppercase">BILLING ID</span>
+                            <p id="modalBillingID" class="text-indigo-600 font-bold text-sm tracking-widest"></p>
+                        </div>
                     </div>
                     <button onclick="closeModal()" class="text-slate-300 hover:text-slate-900 transition-colors">
                         <i class="fa-solid fa-circle-xmark text-2xl"></i>
@@ -113,19 +116,32 @@
                 </div>
                 
                 <div class="space-y-3">
-                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50">
-                        <i class="fa-solid fa-phone text-slate-400 w-5"></i>
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-id-badge text-slate-400"></i>
+                            <span class="text-xs font-bold text-slate-400 uppercase">User ID</span>
+                        </div>
+                        <p id="modalUserID" class="text-slate-800 font-bold"></p>
+                    </div>
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-slate-400"></i>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Mobile</span>
+                        </div>
                         <p id="modalMobile" class="text-slate-800 font-bold"></p>
                     </div>
-                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50">
-                        <i class="fa-solid fa-signal text-slate-400 w-5"></i>
-                        <p id="modalPackage" class="text-slate-800 font-bold"></p>
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-bolt text-slate-400"></i>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Plan</span>
+                        </div>
+                        <p id="modalPackage" class="text-slate-800 font-bold text-indigo-600"></p>
                     </div>
                 </div>
 
-                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-slate-900 text-white font-bold py-5 rounded-2xl mt-8 hover:bg-black transition-all">
-                    <i class="fa-solid fa-credit-card"></i>
-                    PAY BILL NOW
+                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl mt-8 hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95">
+                    <i class="fa-solid fa-receipt"></i>
+                    PAY NOW
                 </a>
             </div>
         </div>
@@ -191,28 +207,30 @@
         function renderGrid(data) {
             const container = document.getElementById('gridContainer');
             container.innerHTML = data.map((user, index) => `
-                <div onclick="openModal(${index})" class="premium-card p-6 rounded-3xl relative overflow-hidden cursor-pointer group">
-                    <i class="fa-solid fa-wifi bg-icon-watermark"></i>
+                <div onclick="openModal(${index})" class="premium-card p-6 rounded-[2rem] relative overflow-hidden cursor-pointer group">
+                    <i class="fa-solid fa-satellite-dish bg-icon-watermark text-indigo-600"></i>
                     
                     <div class="mb-4">
                         <h3 class="text-base font-bold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">${user.name}</h3>
-                        <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">ID: ${user.user_id}</p>
+                        <p class="text-[10px] font-bold text-slate-400 mt-1 tracking-widest uppercase">Billing ID: <span class="text-indigo-500">${user.id_num}</span></p>
                     </div>
                     
                     <div class="space-y-2">
                         <div class="flex items-center gap-2 text-slate-600">
-                            <i class="fa-solid fa-phone text-[10px] text-indigo-400"></i>
+                            <i class="fa-solid fa-mobile-button text-[10px] text-slate-400"></i>
                             <span class="text-sm font-semibold">${user.mobile}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-globe text-[10px] text-emerald-500"></i>
-                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-tight">${user.pakage}</span>
+                            <span class="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-full uppercase">
+                                ${user.pakage}
+                            </span>
                         </div>
                     </div>
 
-                    <div class="mt-6 flex justify-end">
-                        <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                            <i class="fa-solid fa-arrow-right"></i>
+                    <div class="mt-6 flex justify-between items-center">
+                        <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">View Details</span>
+                        <div class="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                            <i class="fa-solid fa-arrow-right-long"></i>
                         </div>
                     </div>
                 </div>
@@ -224,15 +242,17 @@
             const results = userData.filter(u => 
                 (u.name && u.name.toLowerCase().includes(q)) || 
                 (u.mobile && u.mobile.includes(q)) ||
-                (u.user_id && u.user_id.toLowerCase().includes(q))
+                (u.id_num && u.id_num.toLowerCase().includes(q))
             );
+            filteredData = results;
             renderGrid(results);
         }
 
         function openModal(i) {
             const u = filteredData[i];
             document.getElementById('modalName').innerText = u.name;
-            document.getElementById('modalID').innerText = "Account ID: " + u.user_id;
+            document.getElementById('modalBillingID').innerText = u.id_num;
+            document.getElementById('modalUserID').innerText = u.user_id;
             document.getElementById('modalMobile').innerText = u.mobile;
             document.getElementById('modalPackage').innerText = u.pakage;
             document.getElementById('payBtn').href = `https://ispbill.com/pay.php?c=1021&q=${u.id_num}`;
