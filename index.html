@@ -3,63 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HS INTERNET | Management Portal</title>
+    <title>HS INTERNET | Portal</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4338ca">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #cbd5e1; 
-        }
-
-        .premium-header {
-            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #7e22ce 100%);
-            box-shadow: 0 10px 30px -5px rgba(67, 56, 202, 0.4);
-        }
-
-        .premium-card {
-            background: #ffffff;
-            border-top: 4px solid #6366f1;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            padding: 1.25rem;
-        }
-
-        .premium-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1);
-            border-top-color: #a855f7;
-        }
-
-        .bg-icon-watermark {
-            position: absolute;
-            right: -8px;
-            bottom: -8px;
-            font-size: 4rem;
-            opacity: 0.04;
-            transform: rotate(-10deg);
-            pointer-events: none;
-        }
-
-        .custom-select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.2em 1.2em;
-        }
-
-        .modal-item-icon {
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #cbd5e1; }
+        .premium-header { background: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #7e22ce 100%); box-shadow: 0 10px 30px -5px rgba(67, 56, 202, 0.4); }
+        .premium-card { background: #ffffff; border-top: 4px solid #6366f1; transition: all 0.3s ease; position: relative; padding: 1.25rem; }
+        .premium-card:hover { transform: translateY(-5px); box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1); }
+        .bg-icon-watermark { position: absolute; right: -8px; bottom: -8px; font-size: 4rem; opacity: 0.04; transform: rotate(-10deg); pointer-events: none; }
+        #installBtn { display: none; } /* Hidden by default, shown via JS */
     </style>
 </head>
 <body class="min-h-screen">
@@ -78,13 +36,17 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <select id="sortOrder" onchange="sortAndRender()" 
-                            class="custom-select bg-white/10 border border-white/20 text-[10px] font-bold py-2 pl-3 pr-8 rounded-lg outline-none">
-                        <option value="default" class="text-slate-900">DEFAULT</option>
-                        <option value="name-asc" class="text-slate-900">NAME (A-Z)</option>
-                        <option value="name-desc" class="text-slate-900">NAME (Z-A)</option>
+                    <button id="installBtn" onclick="installApp()" class="bg-emerald-500 hover:bg-emerald-600 text-[10px] font-bold px-3 py-2 rounded-lg flex items-center gap-2 transition-all shadow-lg animate-bounce">
+                        <i class="fa-solid fa-download"></i> INSTALL
+                    </button>
+                    
+                    <select id="sortOrder" onchange="sortAndRender()" class="bg-white/10 border border-white/20 text-[10px] font-bold py-2 pl-2 pr-2 rounded-lg outline-none">
+                        <option value="default" class="text-slate-900">SORT</option>
+                        <option value="name-asc" class="text-slate-900">A-Z</option>
+                        <option value="name-desc" class="text-slate-900">Z-A</option>
                     </select>
-                    <button onclick="refreshData(true)" class="bg-white/10 hover:bg-white/20 border border-white/20 p-2 rounded-lg transition-all active:scale-90">
+                    
+                    <button onclick="refreshData(true)" class="bg-white/10 p-2 rounded-lg transition-all active:scale-90">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate text-white text-xs"></i>
                     </button>
                 </div>
@@ -93,9 +55,7 @@
             <div class="pb-5">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-xs"></i>
-                    <input type="text" id="searchInput" onkeyup="filterData()" 
-                           placeholder="Search Billing ID, Name, or Mobile..." 
-                           class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl outline-none text-sm text-white placeholder-white/40 focus:ring-1 focus:ring-white/40">
+                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Search Billing ID, Name, or Mobile..." class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl outline-none text-sm text-white placeholder-white/40">
                 </div>
             </div>
         </div>
@@ -110,62 +70,35 @@
 
     <div id="userModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="relative bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div class="relative bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden">
             <div class="h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
             <div class="p-8">
-                <div class="flex justify-between items-start mb-8">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100">
-                            <i class="fa-solid fa-user-check text-xl"></i>
-                        </div>
+                <div class="flex justify-between items-start mb-6 text-slate-900">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-user text-indigo-500 text-3xl"></i>
                         <div>
-                            <h2 id="modalName" class="text-xl font-bold text-slate-900 leading-tight">---</h2>
-                            <div class="flex items-center gap-1.5 mt-0.5">
-                                <span class="text-[9px] font-black bg-indigo-600 text-white px-1.5 py-0.5 rounded uppercase tracking-tighter">BILLING ID</span>
-                                <p id="modalBillingID" class="text-indigo-600 font-bold text-xs tracking-wider uppercase"></p>
-                            </div>
+                            <h2 id="modalName" class="text-xl font-bold">---</h2>
+                            <p id="modalBillingID" class="text-indigo-600 font-bold text-[10px] tracking-widest uppercase"></p>
                         </div>
                     </div>
-                    <button onclick="closeModal()" class="text-slate-300 hover:text-slate-900 transition-colors">
-                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
-                    </button>
+                    <button onclick="closeModal()"><i class="fa-solid fa-circle-xmark text-2xl text-slate-300"></i></button>
                 </div>
-                
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                        <div class="modal-item-icon text-indigo-500">
-                            <i class="fa-solid fa-fingerprint"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">System User ID</p>
-                            <p id="modalUserID" class="text-slate-800 font-bold text-sm"></p>
-                        </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                        <i class="fa-solid fa-fingerprint text-indigo-400"></i>
+                        <div><p class="text-[9px] font-bold text-slate-400 uppercase">System ID</p><p id="modalUserID" class="text-slate-800 font-bold text-sm"></p></div>
                     </div>
-
-                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                        <div class="modal-item-icon text-emerald-500">
-                            <i class="fa-solid fa-phone-volume"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Mobile Number</p>
-                            <p id="modalMobile" class="text-slate-800 font-bold text-sm"></p>
-                        </div>
+                    <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                        <i class="fa-solid fa-phone text-emerald-500"></i>
+                        <div><p class="text-[9px] font-bold text-slate-400 uppercase">Mobile</p><p id="modalMobile" class="text-slate-800 font-bold text-sm"></p></div>
                     </div>
-
-                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                        <div class="modal-item-icon text-purple-500">
-                            <i class="fa-solid fa-wifi"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Internet Package</p>
-                            <p id="modalPackage" class="text-indigo-600 font-bold text-sm"></p>
-                        </div>
+                    <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                        <i class="fa-solid fa-wifi text-purple-500"></i>
+                        <div><p class="text-[9px] font-bold text-slate-400 uppercase">Package</p><p id="modalPackage" class="text-indigo-600 font-bold text-sm"></p></div>
                     </div>
                 </div>
-
-                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl mt-10 hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95 group">
-                    <i class="fa-solid fa-credit-card group-hover:animate-pulse"></i>
-                    PROCEED TO PAYMENT
+                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-indigo-600 text-white font-bold py-4 rounded-xl mt-8 hover:bg-indigo-700 shadow-lg transition-all text-sm">
+                    <i class="fa-solid fa-receipt"></i> PROCEED TO PAYMENT
                 </a>
             </div>
         </div>
@@ -175,6 +108,25 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfGqXMYp2p-Mv1fdE1XhBK5p4AQTw4gH8xOqgECW3j0yRCGfgRw-GOHd0C1XFICtug3Q/exec";
         let userData = [];
         let filteredData = [];
+        let deferredPrompt;
+
+        // PWA Install Logic
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'flex';
+        });
+
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('installBtn').style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        }
 
         async function refreshData(forceSync = false) {
             const loader = document.getElementById('loader');
