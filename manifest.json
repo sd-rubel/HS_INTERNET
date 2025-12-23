@@ -1,0 +1,17 @@
+{
+  "name": "HS INTERNET Portal",
+  "short_name": "HS Internet",
+  "description": "Premium ISP Customer Management Portal",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#4338ca",
+  "theme_color": "#4338ca",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/9068/9068642.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
