@@ -1,237 +1,172 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SD STORE ADMIN</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<style>
-:root{
-  --bg:#f8fafc; --card:#fff; --text:#1e293b;
-  --accent:#6366f1; --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
-}
-body{
-  margin:0; font-family:'Hind Siliguri',sans-serif;
-  background:var(--bg); color:var(--text);
-  padding-top:210px;
-}
-header{
-  position:fixed; inset:0 0 auto 0;
-  background:linear-gradient(135deg,#4f46e5,#7c3aed);
-  padding:15px; z-index:1000;
-  box-shadow:0 5px 20px rgba(0,0,0,.15);
-}
-h1{color:#fff;margin:0;font-size:20px;}
-button{cursor:pointer}
-
-.tabs{display:flex;gap:8px;margin-top:15px}
-.tab{
-  flex:1;text-align:center;padding:10px;
-  border-radius:12px;
-  background:rgba(255,255,255,.15);
-  color:#fff;font-weight:700;font-size:13px;
-}
-.tab.active{background:#fff;color:#4f46e5}
-
-.search{
-  margin-top:12px; position:relative;
-}
-.search input{
-  width:100%;padding:14px 45px;
-  border-radius:14px;border:none;outline:none;
-}
-.search i{position:absolute;left:16px;top:17px;color:#94a3b8}
-
-#addBtn{
-  margin-top:10px;width:100%;padding:14px;
-  border:none;border-radius:14px;
-  background:#22c55e;color:#fff;
-  font-weight:800;display:none;
-}
-
-.card{
-  background:var(--card); margin:12px 15px;
-  border-radius:18px;padding:15px;
-  box-shadow:0 5px 12px rgba(0,0,0,.06);
-  border-left:6px solid var(--accent);
-}
-.card.hot{border-left-color:var(--yellow)}
-.card.expired{border-left-color:var(--red)}
-
-.badge{
-  font-size:11px;padding:4px 8px;
-  border-radius:10px;background:#e5e7eb;
-}
-
-#loader{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.7);
-  display:none;align-items:center;justify-content:center;
-  flex-direction:column;color:#fff;z-index:9999;
-}
-.spinner{
-  width:40px;height:40px;border:4px solid #fff;
-  border-top-color:var(--accent);
-  border-radius:50%;animation:spin 1s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.modal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.7);
-  display:none;align-items:center;justify-content:center;
-  z-index:2000;
-}
-.modal-box{
-  background:#fff;width:90%;max-width:350px;
-  border-radius:20px;padding:25px;
-}
-.modal-box a{
-  display:block;text-align:center;
-  padding:14px;border-radius:14px;
-  background:#10b981;color:#fff;
-  font-weight:800;text-decoration:none;
-}
-.delete{
-  margin-top:15px;width:100%;
-  border:none;background:none;
-  color:#ef4444;font-weight:700;
-}
-</style>
+    <base target="_top">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .user-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .user-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
 </head>
+<body class="bg-[#f8fafc] text-slate-900">
 
-<body>
+    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-2">
+                    <div class="bg-blue-600 p-2 rounded-lg text-white">
+                        <i class="fa fa-bolt text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+                        ISP Billing Manager
+                    </span>
+                </div>
+                
+                <div class="hidden md:block flex-1 max-w-md mx-8">
+                    <div class="relative">
+                        <input type="text" id="searchInput" onkeyup="filterData()" 
+                               placeholder="Search name, mobile, or ID..." 
+                               class="w-full bg-slate-100 border-none rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 transition-all">
+                        <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    </div>
+                </div>
 
-<div id="loader">
-  <div class="spinner"></div>
-  <b style="margin-top:10px">লোড হচ্ছে...</b>
-</div>
+                <button onclick="refreshData()" class="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-2xl font-semibold transition-all text-slate-700 shadow-sm">
+                    <i id="syncIcon" class="fa fa-arrows-rotate"></i> Update Data
+                </button>
+            </div>
+        </div>
+    </nav>
 
-<header>
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h1>SD STORE ADMIN</h1>
-    <button onclick="syncAll()" style="background:#fff;border:none;border-radius:10px;padding:6px 15px;font-weight:800">SYNC</button>
-  </div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="md:hidden mb-6">
+            <input type="text" id="searchInputMobile" onkeyup="filterData(true)" 
+                   placeholder="Search..." 
+                   class="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 shadow-sm">
+        </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('all',this)">All</div>
-    <div class="tab" onclick="switchTab('home',this)">Homeline</div>
-    <div class="tab" onclick="switchTab('hot',this)">Hotspot</div>
-    <div class="tab" onclick="switchTab('exp',this)">Expired</div>
-  </div>
+        <div id="gridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="skeleton h-48 rounded-3xl"></div>
+            <div class="skeleton h-48 rounded-3xl"></div>
+            <div class="skeleton h-48 rounded-3xl"></div>
+            <div class="skeleton h-48 rounded-3xl"></div>
+        </div>
+    </main>
 
-  <div class="search">
-    <i class="fa fa-search"></i>
-    <input id="search" onkeyup="handleSearch()" placeholder="ID বা নাম লিখুন">
-    <button id="addBtn" onclick="addUser()">+ Add New User</button>
-  </div>
-</header>
+    <div id="userModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 px-6 py-8 text-white relative">
+                    <button onclick="closeModal()" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                    <div id="modalInitials" class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl font-bold mb-4"></div>
+                    <h3 id="modalName" class="text-2xl font-bold">---</h3>
+                    <p id="modalID" class="text-blue-100"></p>
+                </div>
+                <div class="px-6 py-6 space-y-4 bg-white">
+                    <div class="flex justify-between border-b border-slate-50 pb-3">
+                        <span class="text-slate-500">Mobile Number</span>
+                        <span id="modalMobile" class="font-semibold text-slate-800"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-50 pb-3">
+                        <span class="text-slate-500">Package Type</span>
+                        <span id="modalPackage" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-50 pb-3">
+                        <span class="text-slate-500">Internal ID</span>
+                        <span id="modalIdNum" class="font-mono font-bold text-slate-800"></span>
+                    </div>
+                    
+                    <a id="payNowBtn" href="#" target="_blank" class="mt-6 flex items-center justify-center gap-3 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-green-200">
+                        <i class="fa fa-credit-card"></i> Pay Bill Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div id="list"></div>
+    <script>
+        let userData = [];
 
-<div class="modal" id="modal" onclick="closeModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <h3 id="mName"></h3>
-    <div id="mInfo" style="font-size:14px;line-height:1.6"></div>
-    <a id="pay" target="_blank">Pay Now</a>
-    <button class="delete" onclick="deleteUser()">Delete User</button>
-  </div>
-</div>
+        // Initial Load
+        window.onload = refreshData;
 
-<script>
-const API_URL = "https://hs-internet.onrender.com";
-let users=[],tab="all",activeId=null;
+        function refreshData() {
+            const icon = document.getElementById('syncIcon');
+            icon.classList.add('fa-spin');
+            
+            google.script.run.withSuccessHandler(data => {
+                userData = data;
+                renderGrid(data);
+                icon.classList.remove('fa-spin');
+            }).getSheetData();
+        }
 
-window.onload=load;
+        function renderGrid(data) {
+            const container = document.getElementById('gridContainer');
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">No users found.</div>`;
+                return;
+            }
 
-async function load(){
- show(); 
- const r=await fetch(API_URL+"/get_all_users");
- users=await r.json();
- hide(); render();
-}
+            container.innerHTML = data.map((user, index) => `
+                <div onclick="openModal(${index})" class="user-card bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="fa fa-arrow-right text-blue-500"></i>
+                    </div>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-14 h-14 bg-gradient-to-tr from-blue-50 to-indigo-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4 border border-blue-100">
+                            ${user.name ? user.name.charAt(0) : '?'}
+                        </div>
+                        <h3 class="font-bold text-slate-800 truncate w-full">${user.name}</h3>
+                        <p class="text-sm text-slate-500 mb-4">ID: ${user.user_id}</p>
+                        <div class="w-full pt-4 border-t border-slate-50 flex justify-between items-center">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Package</span>
+                            <span class="text-xs font-bold text-blue-600">${user.pakage}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-function daysLeft(d){
- if(!d) return 999;
- return Math.ceil((new Date(d)-new Date())/86400000);
-}
+        function filterData(isMobile = false) {
+            const val = document.getElementById(isMobile ? 'searchInputMobile' : 'searchInput').value.toLowerCase();
+            const filtered = userData.filter(u => 
+                u.name.toLowerCase().includes(val) || 
+                u.mobile.includes(val) || 
+                u.id_num.includes(val)
+            );
+            renderGrid(filtered);
+        }
 
-function render(){
- const q=document.getElementById("search").value.toLowerCase();
- let data=users.filter(u=>
-  (u.name||"").toLowerCase().includes(q) ||
-  u.user_id.includes(q)
- );
+        function openModal(index) {
+            const user = userData[index];
+            document.getElementById('modalName').innerText = user.name;
+            document.getElementById('modalID').innerText = `Customer ID: ${user.user_id}`;
+            document.getElementById('modalMobile').innerText = user.mobile;
+            document.getElementById('modalPackage').innerText = user.pakage;
+            document.getElementById('modalIdNum').innerText = user.id_num;
+            document.getElementById('modalInitials').innerText = user.name.charAt(0);
+            
+            // Set dynamic payment link
+            document.getElementById('payNowBtn').href = `https://ispbill.com/pay.php?c=1021&q=${user.id_num}`;
+            
+            document.getElementById('userModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
 
- if(tab==="home") data=data.filter(u=>u.billing_id);
- if(tab==="hot") data=data.filter(u=>!u.billing_id);
- if(tab==="exp") data=data.filter(u=>daysLeft(u.expire)<=0);
-
- let html="";
- data.forEach(u=>{
-  const d=daysLeft(u.expire);
-  const cls=d<=0?"expired":(!u.billing_id?"hot":"");
-  html+=`
-  <div class="card ${cls}" onclick="openModal('${u.user_id}')">
-    <b>${u.name||"অপেক্ষা করুন..."}</b>
-    <span class="badge" style="float:right">${u.expire||""}</span>
-    <div style="font-size:12px;opacity:.8">ID: ${u.user_id}</div>
-  </div>`;
- });
- document.getElementById("list").innerHTML=html;
-}
-
-function handleSearch(){
- const v=search.value;
- addBtn.style.display=/^\d{7,11}$/.test(v)?"block":"none";
- render();
-}
-
-function switchTab(t,e){
- tab=t;
- document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
- e.classList.add("active");
- render();
-}
-
-function openModal(id){
- activeId=id;
- const u=users.find(x=>x.user_id===id);
- mName.innerText=u.name||"User";
- mInfo.innerHTML=`ID: ${u.user_id}<br>Pkg: ${u.package}<br>Exp: ${u.expire}`;
- pay.href=`https://ispbill.com/pay.php?c=1021&q=${u.billing_id||u.user_id}`;
- modal.style.display="flex";
-}
-
-function closeModal(){modal.style.display="none"}
-
-async function addUser(){
- show();
- await fetch(`${API_URL}/fetch_user?id=${search.value}`);
- await load();
- search.value=""; addBtn.style.display="none";
-}
-
-async function deleteUser(){
- if(!confirm("ডিলিট করবেন?")) return;
- show();
- await fetch(`${API_URL}/delete_user?id=${activeId}`);
- await load();
- closeModal();
-}
-
-async function syncAll(){
- show();
- await fetch(API_URL+"/sync_sheet");
- await load();
-}
-
-function show(){loader.style.display="flex"}
-function hide(){loader.style.display="none"}
-</script>
-
+        function closeModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
 </body>
 </html>
