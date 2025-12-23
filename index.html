@@ -1,144 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium ISP Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .user-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .user-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .user-card:hover { transform: translateY(-8px); transition: all 0.3s ease; }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900">
+<body class="bg-[#f0f2f5] min-h-screen text-slate-800">
 
-    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center gap-2">
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
-                        <i class="fa fa-users text-xl"></i>
-                    </div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-600">
-                        User Database
-                    </span>
+    <nav class="sticky top-0 z-50 glass border-b border-slate-200 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2.5 rounded-2xl shadow-lg shadow-indigo-200">
+                    <i class="fa fa-wifi text-white text-xl"></i>
                 </div>
-                
-                <div class="hidden md:block flex-1 max-w-md mx-8">
-                    <div class="relative">
-                        <input type="text" id="searchInput" onkeyup="filterData()" 
-                               placeholder="Search name, mobile, or ID..." 
-                               class="w-full bg-slate-100 border-none rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 transition-all">
-                        <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    </div>
-                </div>
-
-                <button onclick="refreshData()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-2xl font-semibold transition-all shadow-md shadow-indigo-100">
-                    <i id="syncIcon" class="fa fa-arrows-rotate"></i> Update Data
-                </button>
+                <h1 class="text-xl font-bold tracking-tight text-slate-900">HS INTERNET</h1>
             </div>
+
+            <div class="relative w-full md:w-96">
+                <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" onkeyup="filterData()" 
+                       placeholder="Search name, phone or ID..." 
+                       class="w-full pl-12 pr-4 py-3 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all outline-none">
+            </div>
+
+            <button onclick="refreshData()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-semibold transition-all shadow-lg shadow-indigo-100">
+                <i id="syncIcon" class="fa fa-rotate"></i> Sync Data
+            </button>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div id="errorMessage" class="hidden mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl"></div>
-
-        <div id="gridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <div class="skeleton h-48 rounded-3xl"></div>
-            <div class="skeleton h-48 rounded-3xl"></div>
-            <div class="skeleton h-48 rounded-3xl"></div>
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <div id="loader" class="flex flex-col items-center justify-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+            <p class="mt-4 text-slate-500 font-medium">Fetching secure data...</p>
         </div>
+
+        <div id="gridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 hidden">
+            </div>
     </main>
 
-    <div id="userModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
-            <div class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-md transform transition-all">
-                <div class="bg-indigo-600 px-6 py-8 text-white">
-                    <div id="modalInitials" class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold mb-4"></div>
-                    <h3 id="modalName" class="text-2xl font-bold">---</h3>
-                    <p id="modalID" class="text-indigo-100"></p>
+    <div id="userModal" class="fixed inset-0 z-[100] hidden overflow-y-auto flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="relative bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modalBox">
+            <div class="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white">
+                <div id="modalAvatar" class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold mb-4"></div>
+                <h3 id="modalName" class="text-2xl font-bold">---</h3>
+                <p id="modalID" class="opacity-70 font-medium"></p>
+            </div>
+            <div class="p-8 space-y-5">
+                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+                    <i class="fa fa-phone text-indigo-500 bg-white p-3 rounded-xl shadow-sm"></i>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase">Mobile</p><p id="modalMobile" class="font-bold text-slate-700"></p></div>
                 </div>
-                <div class="px-6 py-6 space-y-4">
-                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Mobile</span><span id="modalMobile" class="font-bold"></span></div>
-                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Package</span><span id="modalPackage" class="font-bold text-indigo-600"></span></div>
-                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500">ID Number</span><span id="modalIdNum" class="font-mono"></span></div>
-                    
-                    <a id="payNowBtn" href="#" target="_blank" class="mt-4 flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl transition-all">
-                        <i class="fa fa-credit-card"></i> Pay Now
-                    </a>
+                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+                    <i class="fa fa-box text-indigo-500 bg-white p-3 rounded-xl shadow-sm"></i>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase">Package</p><p id="modalPackage" class="font-bold text-slate-700"></p></div>
                 </div>
+                
+                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-5 rounded-[1.5rem] shadow-xl shadow-emerald-100 transition-all text-lg mt-4">
+                    <i class="fa fa-credit-card"></i> Pay Now
+                </a>
             </div>
         </div>
     </div>
 
     <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfGqXMYp2p-Mv1fdE1XhBK5p4AQTw4gH8xOqgECW3j0yRCGfgRw-GOHd0C1XFICtug3Q/exec";
         let userData = [];
 
-        window.onload = refreshData;
-
-        function refreshData() {
+        async function refreshData() {
+            const loader = document.getElementById('loader');
+            const grid = document.getElementById('gridContainer');
             const icon = document.getElementById('syncIcon');
-            const errorDiv = document.getElementById('errorMessage');
-            icon.classList.add('fa-spin');
-            errorDiv.classList.add('hidden');
             
-            google.script.run.withSuccessHandler(data => {
-                icon.classList.remove('fa-spin');
-                if (data.error) {
-                    errorDiv.innerText = data.error;
-                    errorDiv.classList.remove('hidden');
-                    return;
-                }
+            icon.classList.add('fa-spin');
+            loader.classList.remove('hidden');
+            grid.classList.add('hidden');
+
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
                 userData = data;
                 renderGrid(data);
-            }).getSheetData();
+                grid.classList.remove('hidden');
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                alert("Could not load data. Ensure your Google Script is deployed as 'Anyone'.");
+            } finally {
+                loader.classList.add('hidden');
+                icon.classList.remove('fa-spin');
+            }
         }
 
         function renderGrid(data) {
             const container = document.getElementById('gridContainer');
             container.innerHTML = data.map((user, index) => `
-                <div onclick="openModal(${index})" class="user-card bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-200">
+                <div onclick="openModal(${index})" class="user-card bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer group">
                     <div class="flex flex-col items-center text-center">
-                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-3">
+                        <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-bold text-xl mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
                             ${user.name ? user.name.charAt(0) : '?'}
                         </div>
-                        <h3 class="font-bold text-slate-800 truncate w-full">${user.name || 'N/A'}</h3>
-                        <p class="text-xs text-slate-500 mb-4">ID: ${user.user_id || 'N/A'}</p>
-                        <span class="text-[10px] px-3 py-1 bg-slate-100 rounded-full font-bold uppercase text-slate-600">${user.pakage || 'No Package'}</span>
+                        <h3 class="font-bold text-slate-800 text-lg mb-1">${user.name}</h3>
+                        <p class="text-sm text-slate-400 font-medium">ID: ${user.user_id}</p>
+                        <div class="mt-4 px-4 py-1.5 bg-slate-50 rounded-full text-[11px] font-bold text-indigo-600 uppercase tracking-wider">
+                            ${user.pakage}
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
         function filterData() {
-            const val = document.getElementById('searchInput').value.toLowerCase();
+            const q = document.getElementById('searchInput').value.toLowerCase();
             const filtered = userData.filter(u => 
-                (u.name && u.name.toLowerCase().includes(val)) || 
-                (u.mobile && u.mobile.includes(val)) || 
-                (u.id_num && u.id_num.includes(val))
+                u.name.toLowerCase().includes(q) || 
+                u.mobile.includes(q) || 
+                u.id_num.includes(q)
             );
             renderGrid(filtered);
         }
 
-        function openModal(index) {
-            const user = userData[index];
-            document.getElementById('modalName').innerText = user.name || 'N/A';
-            document.getElementById('modalID').innerText = `User ID: ${user.user_id || 'N/A'}`;
-            document.getElementById('modalMobile').innerText = user.mobile || 'N/A';
-            document.getElementById('modalPackage').innerText = user.pakage || 'N/A';
-            document.getElementById('modalIdNum').innerText = user.id_num || 'N/A';
-            document.getElementById('modalInitials').innerText = user.name ? user.name.charAt(0) : '?';
-            document.getElementById('payNowBtn').href = `https://ispbill.com/pay.php?c=1021&q=${user.id_num}`;
-            document.getElementById('userModal').classList.remove('hidden');
+        function openModal(i) {
+            const u = userData[i];
+            const modal = document.getElementById('userModal');
+            const box = document.getElementById('modalBox');
+            
+            document.getElementById('modalName').innerText = u.name;
+            document.getElementById('modalID').innerText = "System ID: " + u.user_id;
+            document.getElementById('modalMobile').innerText = u.mobile;
+            document.getElementById('modalPackage').innerText = u.pakage;
+            document.getElementById('modalAvatar').innerText = u.name.charAt(0);
+            document.getElementById('payBtn').href = `https://ispbill.com/pay.php?c=1021&q=${u.id_num}`;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 10);
         }
 
         function closeModal() {
-            document.getElementById('userModal').classList.add('hidden');
+            const modal = document.getElementById('userModal');
+            const box = document.getElementById('modalBox');
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
+
+        window.onload = refreshData;
     </script>
 </body>
 </html>
