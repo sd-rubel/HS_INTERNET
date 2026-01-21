@@ -1,21 +1,33 @@
 {
-  "name": "HS INTERNET Portal",
-  "short_name": "HS Internet",
-  "start_url": "index.html",
+  "name": "SMART ISP Portal",
+  "short_name": "SMART-ISP",
+  "description": "Official payment application developed by SD Rubel for SMART ISP subscribers",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#4338ca",
   "theme_color": "#4338ca",
+  "orientation": "portrait",
+  "categories": ["business", "finance", "utilities"],
   "icons": [
     {
-      "src": "https://github.com/sd-rubel/HS_INTERNET/blob/main/Gemini_Generated_Image_dhaehzdhaehzdhae.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://github.com/sd-rubel/HS_INTERNET/blob/main/Gemini_Generated_Image_dhaehzdhaehzdhae.png",
-      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "description": "Main dashboard showing user list"
+    }
+  ],
+  "prefer_related_applications": false
 }
