@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HS INTERNET | Portal</title>
+    <title>SMART ISP | Customer Portal</title>
     <link rel="manifest" href="manifest.json">
     <link rel="manifest" href="manifest.json?v=1.1">
     <meta name="theme-color" content="#4338ca">
@@ -13,12 +13,82 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #cbd5e1; }
-        .premium-header { background: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #7e22ce 100%); box-shadow: 0 10px 30px -5px rgba(67, 56, 202, 0.4); }
-        .premium-card { background: #ffffff; border-top: 4px solid #6366f1; transition: all 0.3s ease; position: relative; padding: 1.25rem; }
-        .premium-card:hover { transform: translateY(-5px); box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1); }
-        .bg-icon-watermark { position: absolute; right: -8px; bottom: -8px; font-size: 4rem; opacity: 0.04; transform: rotate(-10deg); pointer-events: none; }
-        #installBtn { display: none; } /* Hidden by default, shown via JS */
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+        }
+        .premium-header { 
+            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #7e22ce 100%); 
+            box-shadow: 0 10px 30px -5px rgba(67, 56, 202, 0.4); 
+        }
+        .premium-card { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px); 
+            border-top: 4px solid #6366f1; 
+            transition: all 0.3s ease; 
+            position: relative; 
+            padding: 1.25rem; 
+            border-radius: 1.5rem; 
+        }
+        .premium-card:hover { 
+            transform: translateY(-5px) scale(1.02); 
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3); 
+        }
+        .bg-icon-watermark { 
+            position: absolute; 
+            right: -8px; 
+            bottom: -8px; 
+            font-size: 4rem; 
+            opacity: 0.04; 
+            transform: rotate(-10deg); 
+            pointer-events: none; 
+        }
+        #installBtn { 
+            display: none; 
+        }
+        .glass-effect { 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+        }
+        .no-results-card { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px); 
+            border: 2px dashed #cbd5e1; 
+        }
+        .update-notification { 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+        }
+        .stats-card { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px); 
+        }
+        .about-modal { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+        .profile-img { 
+            width: 100px; 
+            height: 100px; 
+            border: 4px solid rgba(255, 255, 255, 0.3); 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); 
+        }
+        .social-icon { 
+            transition: all 0.3s ease; 
+            border: 2px solid rgba(255, 255, 255, 0.3); 
+        }
+        .social-icon:hover { 
+            transform: translateY(-3px) scale(1.1); 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); 
+        }
+        .install-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -27,7 +97,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30">
+                    <div class="w-10 h-10 glass-effect rounded-xl flex items-center justify-center">
                         <i class="fa-solid fa-tower-broadcast text-white"></i>
                     </div>
                     <div>
@@ -37,201 +107,586 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button id="installBtn" onclick="installApp()" class="bg-emerald-500 hover:bg-emerald-600 text-[10px] font-bold px-3 py-2 rounded-lg flex items-center gap-2 transition-all shadow-lg animate-bounce">
-                        <i class="fa-solid fa-download"></i> INSTALL
+                    <!-- About Button -->
+                    <button onclick="openAboutModal()" class="glass-effect p-2 rounded-lg transition-all active:scale-90" title="About App">
+                        <i class="fa-solid fa-circle-info text-white text-xs"></i>
                     </button>
                     
-                    <select id="sortOrder" onchange="sortAndRender()" class="bg-white/10 border border-white/20 text-[10px] font-bold py-2 pl-2 pr-2 rounded-lg outline-none">
+                    <!-- Install Button (will be shown via JS) -->
+                    <button id="installBtn" onclick="installApp()" class="install-pulse bg-emerald-500 hover:bg-emerald-600 text-[10px] font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-lg">
+                        <i class="fa-solid fa-download"></i> INSTALL APP
+                    </button>
+                    
+                    <select id="sortOrder" onchange="sortAndRender()" class="glass-effect text-[10px] font-bold py-2 pl-2 pr-2 rounded-lg outline-none">
                         <option value="default" class="text-slate-900">SORT</option>
                         <option value="name-asc" class="text-slate-900">A-Z</option>
                         <option value="name-desc" class="text-slate-900">Z-A</option>
                     </select>
                     
-                    <button onclick="refreshData(true)" class="bg-white/10 p-2 rounded-lg transition-all active:scale-90">
+                    <button onclick="refreshData(true)" class="glass-effect p-2 rounded-lg transition-all active:scale-90">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate text-white text-xs"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="pb-5">
+            <!-- Stats Display -->
+            <div class="pb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-users text-white/80 text-xs"></i>
+                            <span class="text-[10px] font-bold text-white/80">TOTAL: </span>
+                            <span id="totalUsers" class="text-white font-bold text-xs">0</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-white/80 text-xs"></i>
+                            <span class="text-[10px] font-bold text-white/80">SHOWING: </span>
+                            <span id="showingUsers" class="text-white font-bold text-xs">0</span>
+                        </div>
+                    </div>
+                    <div id="liveSearchIndicator" class="hidden flex items-center gap-1">
+                        <i class="fa-solid fa-search text-emerald-300 text-[10px]"></i>
+                        <span class="text-[8px] text-emerald-300 font-bold uppercase">LIVE SEARCH</span>
+                    </div>
+                </div>
+
+                <!-- Search with Clear Button -->
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-xs"></i>
-                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Search Billing ID, Name, or Mobile..." class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl outline-none text-sm text-white placeholder-white/40">
+                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Search Billing ID, Name, or Mobile..." 
+                           class="w-full pl-10 pr-10 py-2.5 bg-white/10 border border-white/20 rounded-xl outline-none text-sm text-white placeholder-white/40 focus:ring-2 focus:ring-white/30 focus:border-white/30 transition-all">
+                    <button id="clearSearchBtn" onclick="clearSearch()" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 text-sm hidden">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-44 pb-20">
-        <div id="loader" class="hidden flex flex-col items-center justify-center py-20">
-            <div class="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
-        </div>
-        <div id="gridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
-    </main>
-
-    <div id="userModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="relative bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden">
-            <div class="h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+    <!-- About Modal -->
+    <div id="aboutModal" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeAboutModal()"></div>
+        <div class="relative about-modal rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
             <div class="p-8">
-                <div class="flex justify-between items-start mb-6 text-slate-900">
+                <div class="flex justify-between items-start mb-6">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-user text-indigo-500 text-3xl"></i>
-                        <div>
-                            <h2 id="modalName" class="text-xl font-bold">---</h2>
-                            <p id="modalBillingID" class="text-indigo-600 font-bold text-[10px] tracking-widest uppercase"></p>
+                        <i class="fa-solid fa-circle-info text-white text-2xl"></i>
+                        <h2 class="text-xl font-bold text-white">About SMART ISP</h2>
+                    </div>
+                    <button onclick="closeAboutModal()" class="text-white/80 hover:text-white">
+                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="flex flex-col items-center mb-6">
+                    <img src="https://github.com/sd-rubel/NihonGoBD/blob/main/profile.jpg?raw=true" 
+                         alt="SD Rubel" 
+                         class="profile-img rounded-full mb-4">
+                    <h3 class="text-lg font-bold text-white mb-1">SD Rubel</h3>
+                    <p class="text-white/80 text-sm">Developer</p>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 mb-6">
+                    <h4 class="text-white font-bold mb-2 text-sm">Smart ISP Payment Solution</h4>
+                    <p class="text-white/90 text-sm mb-4">
+                        Official payment application developed by SD Rubel. We are committed to providing efficient digital solutions for ISP subscribers.
+                    </p>
+                    
+                    <div class="mb-4">
+                        <p class="text-white/80 text-sm mb-2">For inquiries or technical assistance:</p>
+                        
+                        <div class="flex justify-center gap-4">
+                            <!-- Facebook -->
+                            <a href="http://www.facebook.com/sdxrubel" 
+                               target="_blank" 
+                               class="social-icon w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fab fa-facebook-f text-white"></i>
+                            </a>
+                            
+                            <!-- WhatsApp -->
+                            <a href="https://wa.me/qr/B5FKTZNDYYEBP1" 
+                               target="_blank" 
+                               class="social-icon w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                                <i class="fab fa-whatsapp text-white"></i>
+                            </a>
+                            
+                            <!-- Email -->
+                            <a href="mailto:sdnrubel@gmail.com" 
+                               class="social-icon w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-envelope text-white"></i>
+                            </a>
                         </div>
                     </div>
-                    <button onclick="closeModal()"><i class="fa-solid fa-circle-xmark text-2xl text-slate-300"></i></button>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <i class="fa-solid fa-fingerprint text-indigo-400"></i>
-                        <div><p class="text-[9px] font-bold text-slate-400 uppercase">System ID</p><p id="modalUserID" class="text-slate-800 font-bold text-sm"></p></div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <i class="fa-solid fa-phone text-emerald-500"></i>
-                        <div><p class="text-[9px] font-bold text-slate-400 uppercase">Mobile</p><p id="modalMobile" class="text-slate-800 font-bold text-sm"></p></div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <i class="fa-solid fa-wifi text-purple-500"></i>
-                        <div><p class="text-[9px] font-bold text-slate-400 uppercase">Package</p><p id="modalPackage" class="text-indigo-600 font-bold text-sm"></p></div>
+                    
+                    <div class="text-center">
+                        <p class="text-white/70 text-xs italic">
+                            Version 2.0 • Made with ❤️ for ISP Community
+                        </p>
                     </div>
                 </div>
-                <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-indigo-600 text-white font-bold py-4 rounded-xl mt-8 hover:bg-indigo-700 shadow-lg transition-all text-sm">
-                    <i class="fa-solid fa-receipt"></i> PROCEED TO PAYMENT
-                </a>
             </div>
         </div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfGqXMYp2p-Mv1fdE1XhBK5p4AQTw4gH8xOqgECW3j0yRCGfgRw-GOHd0C1XFICtug3Q/exec";
-        let userData = [];
-        let filteredData = [];
-        let deferredPrompt;
-
-        // PWA Install Logic
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBtn').style.display = 'flex';
-        });
-
-        async function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('installBtn').style.display = 'none';
-                }
-                deferredPrompt = null;
-            }
-        }
-
-        async function refreshData(forceSync = false) {
-            const loader = document.getElementById('loader');
-            const syncIcon = document.getElementById('syncIcon');
-            const syncDisplay = document.getElementById('lastSyncDisplay');
-            const cachedData = localStorage.getItem('hs_user_data');
-            const lastSync = localStorage.getItem('hs_last_sync');
-
-            if (cachedData && !forceSync) {
-                userData = JSON.parse(cachedData);
-                syncDisplay.innerText = "Synced: " + lastSync;
-                sortAndRender();
-                return;
-            }
-
-            syncIcon.classList.add('fa-spin');
-            loader.classList.remove('hidden');
-
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                userData = data;
-                const timestamp = new Date().toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
-                localStorage.setItem('hs_user_data', JSON.stringify(data));
-                localStorage.setItem('hs_last_sync', timestamp);
-                syncDisplay.innerText = "Synced: " + timestamp;
-                sortAndRender();
-            } catch (err) {
-                console.error(err);
-                if(cachedData) sortAndRender();
-            } finally {
-                loader.classList.add('hidden');
-                syncIcon.classList.remove('fa-spin');
-            }
-        }
-
-        function sortAndRender() {
-            const order = document.getElementById('sortOrder').value;
-            let dataToSort = [...userData];
-            if (order === 'name-asc') dataToSort.sort((a, b) => a.name.localeCompare(b.name));
-            else if (order === 'name-desc') dataToSort.sort((a, b) => b.name.localeCompare(a.name));
-            filteredData = dataToSort;
-            renderGrid(filteredData);
-        }
-
-        function renderGrid(data) {
-            const container = document.getElementById('gridContainer');
-            container.innerHTML = data.map((user, index) => `
-                <div onclick="openModal(${index})" class="premium-card rounded-2xl cursor-pointer group shadow-sm">
-                    <i class="fa-solid fa-wifi bg-icon-watermark text-indigo-500"></i>
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-start gap-2.5 overflow-hidden">
-                            <i class="fa-solid fa-circle-user text-indigo-400 mt-0.5 text-lg"></i>
-                            <div class="overflow-hidden">
-                                <h3 class="text-sm font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">${user.name}</h3>
-                                <p class="text-[9px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1">
-                                    <i class="fa-solid fa-barcode text-[8px]"></i> ${user.id_num}
-                                </p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-indigo-600 mt-1 transition-colors"></i>
-                    </div>
-                    <div class="mt-3 flex items-center justify-between">
-                        <div class="flex items-center gap-2 text-slate-600">
-                            <i class="fa-solid fa-phone text-[9px] text-slate-400"></i>
-                            <span class="text-[12px] font-semibold">${user.mobile}</span>
-                        </div>
-                        <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[9px] font-bold rounded-md uppercase border border-indigo-100">
-                            ${user.pakage}
-                        </span>
+    <!-- Update Notification Modal -->
+    <div id="updateModal" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
+        <div class="relative update-notification rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-start gap-3 mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-white text-2xl mt-1"></i>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Data Update Available</h3>
+                        <p class="text-amber-100 text-sm">New data is available from Google Sheets. Would you like to update?</p>
                     </div>
                 </div>
-            `).join('');
-        }
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeUpdateModal()" class="flex-1 bg-white/20 hover:bg-white/30 text-white font-bold py-3 rounded-lg transition-all">
+                        Later
+                    </button>
+                    <button onclick="confirmUpdate()" class="flex-1 bg-white text-amber-700 font-bold py-3 rounded-lg hover:bg-amber-50 transition-all">
+                        Update Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 pt-48 pb-20">
+    <div id="loader" class="hidden flex flex-col items-center justify-center py-20">
+        <div class="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4"></div>
+        <p class="text-white font-semibold">Loading users data...</p>
+    </div>
+    
+    <div id="gridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+    
+    <!-- No Results Message -->
+    <div id="noResults" class="hidden">
+        <div class="no-results-card rounded-2xl p-8 text-center">
+            <i class="fa-solid fa-user-slash text-4xl text-slate-300 mb-4"></i>
+            <h3 class="text-lg font-bold text-slate-600 mb-2">No Users Found</h3>
+            <p id="noResultsText" class="text-slate-500 text-sm">Try different search terms</p>
+            <button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-indigo-500 text-white text-sm font-bold rounded-lg hover:bg-indigo-600 transition-all">
+                Clear Search
+            </button>
+        </div>
+    </div>
+</main>
 
+<!-- User Details Modal -->
+<div id="userModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="relative bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+        <div class="p-8">
+            <div class="flex justify-between items-start mb-6 text-slate-900">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-circle-user text-indigo-500 text-3xl"></i>
+                    <div>
+                        <h2 id="modalName" class="text-xl font-bold">---</h2>
+                        <p id="modalBillingID" class="text-indigo-600 font-bold text-[10px] tracking-widest uppercase"></p>
+                    </div>
+                </div>
+                <button onclick="closeModal()"><i class="fa-solid fa-circle-xmark text-2xl text-slate-300"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <i class="fa-solid fa-fingerprint text-indigo-400"></i>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase">System ID</p><p id="modalUserID" class="text-slate-800 font-bold text-sm"></p></div>
+                </div>
+                <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <i class="fa-solid fa-phone text-emerald-500"></i>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase">Mobile</p><p id="modalMobile" class="text-slate-800 font-bold text-sm"></p></div>
+                </div>
+                <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <i class="fa-solid fa-wifi text-purple-500"></i>
+                    <div><p class="text-[9px] font-bold text-slate-400 uppercase">Package</p><p id="modalPackage" class="text-indigo-600 font-bold text-sm"></p></div>
+                </div>
+            </div>
+            <a id="payBtn" href="#" target="_blank" class="flex items-center justify-center gap-3 w-full bg-indigo-600 text-white font-bold py-4 rounded-xl mt-8 hover:bg-indigo-700 shadow-lg transition-all text-sm">
+                <i class="fa-solid fa-receipt"></i> PROCEED TO PAYMENT
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfGqXMYp2p-Mv1fdE1XhBK5p4AQTw4gH8xOqgECW3j0yRCGfgRw-GOHd0C1XFICtug3Q/exec";
+    let userData = [];
+    let filteredData = [];
+    let deferredPrompt;
+    let dataHash = '';
+    let updateAvailable = false;
+
+    // PWA Install Logic
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('installBtn');
+        installBtn.style.display = 'flex';
+        installBtn.classList.add('install-pulse');
+        
+        // Show install instruction tooltip on first visit
+        if (!localStorage.getItem('installPromptShown')) {
+            setTimeout(() => {
+                showInstallTip();
+            }, 2000);
+            localStorage.setItem('installPromptShown', 'true');
+        }
+    });
+
+    // Show install tip
+    function showInstallTip() {
+        const tip = document.createElement('div');
+        tip.className = 'fixed top-24 right-4 z-50 bg-white text-slate-800 text-xs p-3 rounded-lg shadow-xl max-w-xs animate-bounce';
+        tip.innerHTML = `
+            <div class="flex items-start gap-2">
+                <i class="fa-solid fa-lightbulb text-yellow-500 text-sm mt-0.5"></i>
+                <div>
+                    <p class="font-bold mb-1">Install App for Easy Access!</p>
+                    <p class="text-slate-600">Click "INSTALL APP" to add to home screen</p>
+                </div>
+            </div>
+            <div class="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45"></div>
+        `;
+        document.body.appendChild(tip);
+        
+        // Remove tip after 5 seconds
+        setTimeout(() => {
+            tip.remove();
+        }, 5000);
+    }
+
+    async function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                const installBtn = document.getElementById('installBtn');
+                installBtn.innerHTML = '<i class="fa-solid fa-check"></i> INSTALLED';
+                installBtn.classList.remove('install-pulse', 'bg-emerald-500', 'hover:bg-emerald-600');
+                installBtn.classList.add('bg-slate-500', 'cursor-default');
+                installBtn.disabled = true;
+                
+                // Show success message
+                showToast('App installed successfully! 🎉');
+            }
+            deferredPrompt = null;
+        }
+    }
+
+    // About Modal Functions
+    function openAboutModal() {
+        document.getElementById('aboutModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAboutModal() {
+        document.getElementById('aboutModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 z-50 bg-emerald-500 text-white px-4 py-3 rounded-lg shadow-lg animate-slide-up';
+        toast.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-check-circle"></i>
+                <span class="text-sm font-semibold">${message}</span>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('animate-slide-down');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Generate hash from data for change detection
+    function generateDataHash(data) {
+        return btoa(JSON.stringify(data));
+    }
+
+    // Clear search function
+    function clearSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        
+        searchInput.value = '';
+        clearBtn.classList.add('hidden');
+        filterData();
+    }
+
+    // Toggle clear button visibility
+    function toggleClearButton() {
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const searchIndicator = document.getElementById('liveSearchIndicator');
+        
+        if (searchInput.value.length > 0) {
+            clearBtn.classList.remove('hidden');
+            searchIndicator.classList.remove('hidden');
+        } else {
+            clearBtn.classList.add('hidden');
+            searchIndicator.classList.add('hidden');
+        }
+    }
+
+    // Update user count display
+    function updateUserCount() {
+        const totalUsers = userData.length;
+        const showingUsers = filteredData.length;
+        const searchValue = document.getElementById('searchInput').value;
+        
+        document.getElementById('totalUsers').textContent = totalUsers;
+        document.getElementById('showingUsers').textContent = showingUsers;
+        
+        // Show/hide no results message
+        const noResults = document.getElementById('noResults');
+        const noResultsText = document.getElementById('noResultsText');
+        const gridContainer = document.getElementById('gridContainer');
+        
+        if (showingUsers === 0 && totalUsers > 0) {
+            noResults.classList.remove('hidden');
+            gridContainer.classList.add('hidden');
+            noResultsText.textContent = `No users found for "${searchValue}"`;
+        } else {
+            noResults.classList.add('hidden');
+            gridContainer.classList.remove('hidden');
+        }
+    }
+
+// Fetch data with change detection
+async function fetchData(force = false) {
+    try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        const newHash = generateDataHash(data);
+        
+        // Check if data has changed
+        if (force || dataHash !== newHash) {
+            if (!force && dataHash !== '') {
+                // Show update modal if data changed and not forced refresh
+                updateAvailable = true;
+                showUpdateModal();
+                return false;
+            }
+            
+            // Update data
+            userData = data;
+            dataHash = newHash;
+            
+            // Store in cache
+            const timestamp = new Date().toLocaleString([], { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                day: '2-digit', 
+                month: 'short' 
+            });
+            localStorage.setItem('hs_user_data', JSON.stringify(data));
+            localStorage.setItem('hs_data_hash', newHash);
+            localStorage.setItem('hs_last_sync', timestamp);
+            
+            return true;
+        }
+        return false; // No changes
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return false;
+    }
+}
+
+// Show update modal
+function showUpdateModal() {
+    document.getElementById('updateModal').classList.remove('hidden');
+}
+
+// Close update modal
+function closeUpdateModal() {
+    document.getElementById('updateModal').classList.add('hidden');
+}
+
+// Confirm update
+async function confirmUpdate() {
+    closeUpdateModal();
+    await refreshData(true);
+}
+
+// Main refresh function
+async function refreshData(forceSync = false) {
+    const loader = document.getElementById('loader');
+    const syncIcon = document.getElementById('syncIcon');
+    const syncDisplay = document.getElementById('lastSyncDisplay');
+    const cachedData = localStorage.getItem('hs_user_data');
+    const cachedHash = localStorage.getItem('hs_data_hash');
+    const lastSync = localStorage.getItem('hs_last_sync');
+
+    // Show loading
+    loader.classList.remove('hidden');
+    syncIcon.classList.add('fa-spin');
+
+    // If force sync or no cache, fetch new data
+    if (forceSync || !cachedData) {
+        const dataUpdated = await fetchData(true);
+        if (dataUpdated || !cachedData) {
+            const newSync = localStorage.getItem('hs_last_sync');
+            syncDisplay.innerText = "Updated: " + (newSync || "Just now");
+            showToast('Data updated successfully!');
+        }
+    } else {
+        // Use cached data
+        userData = JSON.parse(cachedData);
+        dataHash = cachedHash;
+        syncDisplay.innerText = "Cached: " + lastSync;
+        
+        // Check for updates in background
+        setTimeout(async () => {
+            await fetchData(false);
+        }, 1000);
+    }
+
+    // Update UI
+    sortAndRender();
+    updateUserCount();
+    
+    // Hide loading
+    loader.classList.add('hidden');
+    syncIcon.classList.remove('fa-spin');
+}
+
+// Sort and render function
+function sortAndRender() {
+    const order = document.getElementById('sortOrder').value;
+    let dataToSort = [...userData];
+    
+    if (order === 'name-asc') {
+        dataToSort.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (order === 'name-desc') {
+        dataToSort.sort((a, b) => b.name.localeCompare(a.name));
+    }
+    
+    filteredData = dataToSort;
+    renderGrid(filteredData);
+}
+
+// Render grid function
+function renderGrid(data) {
+    const container = document.getElementById('gridContainer');
+    container.innerHTML = data.map((user, index) => `
+        <div onclick="openModal(${index})" class="premium-card cursor-pointer group shadow-sm">
+            <i class="fa-solid fa-wifi bg-icon-watermark text-indigo-500"></i>
+            <div class="flex items-start justify-between">
+                <div class="flex items-start gap-2.5 overflow-hidden">
+                    <div class="relative">
+                        <i class="fa-solid fa-circle-user text-indigo-400 mt-0.5 text-lg"></i>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border border-white"></div>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h3 class="text-sm font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">${user.name || 'N/A'}</h3>
+                        <p class="text-[9px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-barcode text-[8px]"></i> ${user.id_num || 'N/A'}
+                        </p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-indigo-600 mt-1 transition-colors"></i>
+            </div>
+            <div class="mt-3 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-slate-600">
+                    <i class="fa-solid fa-phone text-[9px] text-slate-400"></i>
+                    <span class="text-[12px] font-semibold">${user.mobile || 'N/A'}</span>
+                </div>
+                <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[9px] font-bold rounded-md uppercase border border-indigo-100">
+                    ${user.pakage || 'Basic'}
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+        // Filter data function
         function filterData() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            const results = userData.filter(u => 
-                (u.name && u.name.toLowerCase().includes(q)) || 
-                (u.mobile && u.mobile.includes(q)) ||
-                (u.id_num && u.id_num.toLowerCase().includes(q))
-            );
+            toggleClearButton();
+            
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            let results = [];
+            
+            if (q.length === 0) {
+                results = [...userData];
+            } else {
+                results = userData.filter(u => 
+                    (u.name && u.name.toLowerCase().includes(q)) || 
+                    (u.mobile && u.mobile.includes(q)) ||
+                    (u.id_num && u.id_num.toLowerCase().includes(q)) ||
+                    (u.pakage && u.pakage.toLowerCase().includes(q)) ||
+                    (u.user_id && u.user_id.toLowerCase().includes(q))
+                );
+            }
+            
             filteredData = results;
             renderGrid(results);
+            updateUserCount();
         }
 
+        // Open modal function
         function openModal(i) {
             const u = filteredData[i];
-            document.getElementById('modalName').innerText = u.name;
-            document.getElementById('modalBillingID').innerText = u.id_num;
-            document.getElementById('modalUserID').innerText = u.user_id;
-            document.getElementById('modalMobile').innerText = u.mobile;
-            document.getElementById('modalPackage').innerText = u.pakage;
-            document.getElementById('payBtn').href = `https://ispbill.com/pay.php?c=1021&q=${u.id_num}`;
+            document.getElementById('modalName').innerText = u.name || 'N/A';
+            document.getElementById('modalBillingID').innerText = u.id_num || 'N/A';
+            document.getElementById('modalUserID').innerText = u.user_id || 'N/A';
+            document.getElementById('modalMobile').innerText = u.mobile || 'N/A';
+            document.getElementById('modalPackage').innerText = u.pakage || 'Basic';
+            document.getElementById('payBtn').href = `https://ispbill.com/pay.php?c=1021&q=${u.id_num || ''}`;
             document.getElementById('userModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
+        // Close modal function
         function closeModal() {
             document.getElementById('userModal').classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
 
-        window.onload = () => refreshData(false);
+        // Initialize search input event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            
+            // Add input event listener for real-time search
+            searchInput.addEventListener('input', function() {
+                toggleClearButton();
+                filterData();
+            });
+            
+            // Add event listener for Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    filterData();
+                }
+            });
+            
+            // Check if app is running in standalone mode (installed)
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                const installBtn = document.getElementById('installBtn');
+                installBtn.innerHTML = '<i class="fa-solid fa-check"></i> INSTALLED';
+                installBtn.classList.remove('install-pulse', 'bg-emerald-500', 'hover:bg-emerald-600');
+                installBtn.classList.add('bg-slate-500', 'cursor-default');
+                installBtn.disabled = true;
+            }
+            
+            // Initial load
+            refreshData(false);
+        });
+
+        // Periodically check for updates (every 5 minutes)
+        setInterval(async () => {
+            if (!updateAvailable) {
+                await fetchData(false);
+            }
+        }, 300000); // 5 minutes
     </script>
 </body>
 </html>
